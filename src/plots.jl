@@ -10,7 +10,7 @@
 ###
 
 
-function plot(x :: AbstractFuzzy, fill = true; name = missing, col = missing, alpha = 0.2, fontsize = 18)
+function plot(x :: FuzzyNumber, fill = true; name = missing, col = missing, alpha = 0.2, fontsize = 18)
 
     edgeCol = "red"; fillcol = "grey"
     if !(ismissing(col)); edgeCol = fillcol = col;end

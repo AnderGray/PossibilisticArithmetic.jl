@@ -13,16 +13,15 @@ using IntervalArithmetic
 using ProbabilityBoundsAnalysis
 using PyPlot
 
-abstract type AbstractFuzzy <: Real end
+import Base: -, +, *, /, //, <, >, ⊆, ^, intersect, issubset, rand, min, max
 
-include("plots.jl")
-include("FuzzyArithmetic.jl")
+abstract type AbstractFuzzy <: Real end
 
 struct FuzzyNumber <: AbstractFuzzy
 
-    Core :: Interval
-    Range :: Interval
-    Membership :: Array{Interval, 1}
+    Core :: Interval{<:Real}
+    Range :: Interval{<:Real}
+    Membership :: Array{Interval{<:Real}, 1}
 
     function FuzzyNumber(Core = interval(0.5), Range = interval(0, 1), Membership = missing; steps = 200)
         
@@ -37,10 +36,20 @@ struct FuzzyNumber <: AbstractFuzzy
     end
 end
 
-FuzzyNumber(lowerbound :: Real, Core :: Real, upperbound :: Real; steps = 200) = FuzzyNumber(interval(Core), interval(lowerbound, upperbound), steps = steps)
-FuzzyNumber(lowerbound :: Real, Core :: Interval, upperbound :: Real; steps = 200) = FuzzyNumber(Core, interval(lowerbound, upperbound), steps = steps)
+function (obj::FuzzyNumber)(x, y)
+    return mass(obj, x, y)
+end
 
-function FuzzyNumber( Membership :: Array{Interval, 1})
+
+function (obj::FuzzyNumber)(x :: Interval{T}) where T <:Real
+    return mass(obj, x)
+end
+
+FuzzyNumber(lowerbound :: Real, Core :: Real, upperbound :: Real; steps = 200) = FuzzyNumber(interval(Core), interval(lowerbound, upperbound), steps = steps)
+FuzzyNumber(lowerbound :: Real, CoreLeft :: Real, CoreRight :: Real, upperbound :: Real; steps = 200) = FuzzyNumber(interval(CoreLeft, CoreRight), interval(lowerbound, upperbound), steps = steps)
+FuzzyNumber(lowerbound :: Real, Core :: Interval{<:Real}, upperbound :: Real; steps = 200) = FuzzyNumber(Core, interval(lowerbound, upperbound), steps = steps)
+
+function FuzzyNumber( Membership :: Array{Interval{T}, 1}) where T <: Real
 
     if !isnested(Membership); throw(ArgumentError("Invalid Membership function, intervals must be nested from Range (Membership[1]) to Core (Membership[end])")); end
     Core = Membership[end]; Range = Membership[1];
@@ -49,16 +58,39 @@ function FuzzyNumber( Membership :: Array{Interval, 1})
 end
 
 
-function isnested( a :: Array{Interval,1})
+function isnested( a :: Array{Interval{T}, 1}) where T <: Real
     leftSorted = issorted( left.(a) ) 
     rightSorted = issorted( right.(a), rev=true) 
     return leftSorted & rightSorted
 end
 
-function mass( x :: FuzzyNumber, y :: Interval)
+function mass( x :: FuzzyNumber, lo :: Real , hi :: Real)
 
-    #Ness = max()
+    if hi < lo; throw(ArgumentError("Incompatable bounds. Provided: [$lo, $hi]")); end
 
+    if x.Membership[1] ⊂ interval(lo, hi); return interval(1,1); end
+    if x.Membership[1].lo > hi; return interval(0,0); end
+    if x.Membership[1].hi < lo; return interval(0,0); end
+
+    lefts = left.(x.Membership);
+    rights = right.(x.Membership);
+
+    j = range(0, 1, length = length(x.Membership))
+
+    vals = [lefts; reverse(rights)];
+    jj = [j;reverse(j)]
+
+    inside = lo .<= vals .<= hi
+
+    Poss = maximum( jj[inside])
+    Ness = 1 - maximum(jj[ .~inside])
+
+    return interval(Ness, Poss)
+
+end
+
+function mass( x :: FuzzyNumber, y :: Interval{T}) where T <: Real  
+    return mass( x, y.lo, y.hi)
 end
 
 function cut( x :: FuzzyNumber, α :: Real )
@@ -100,3 +132,5 @@ function Base.show(io::IO, z::FuzzyNumber)
 
 end
 
+include("plots.jl")
+include("FuzzyArithmetic.jl")

@@ -2,13 +2,14 @@
 
 A julia package for performing fuzzy arithmetic.
 
-### In development package can currently:
+### In development. Package can currently:
 
 * Construct fuzzy numbers with a real or interval core
 * Have different discretization of the membership function
 * Perform alpha cuts
-* Plot fuzzy numbers
 * Perform levelwise arithmeric between fuzzy numbers, intervals and scalars
+* Get bounds on probability mass in an interval
+* Plot fuzzy numbers
 
 ## Install:
 
@@ -40,6 +41,12 @@ Fuzzy: 	 ~ ( Range=[0, 2], Core=[1, 1.5] )
 
 julia> c = a * b
 Fuzzy: 	 ~ ( Range=[0, 4], Core=[1, 1.5] )
+
+julia> mass(c, 3, 4)   # Get probability mass between two values
+[0, 0.351759]
+
+julia> c(3, 4)         # Can also query object directly
+[0, 0.351759]
 
 julia> plot(a)
 julia> plot(b)

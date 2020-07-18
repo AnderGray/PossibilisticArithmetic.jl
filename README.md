@@ -8,6 +8,7 @@ A julia package for performing fuzzy arithmetic.
 * Have different discretization of the membership function
 * Perform alpha cuts
 * Plot fuzzy numbers
+* Perform levelwise arithmeric between fuzzy numbers, intervals and scalars
 
 ## Install:
 

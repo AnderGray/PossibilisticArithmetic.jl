@@ -12,6 +12,7 @@
 using IntervalArithmetic
 using ProbabilityBoundsAnalysis
 using PyPlot
+using3D()
 
 import Base: -, +, *, /, //, <, >, ⊆, ^, intersect, issubset, rand, min, max
 
@@ -132,5 +133,7 @@ function Base.show(io::IO, z::FuzzyNumber)
 
 end
 
-include("plots.jl")
+
 include("FuzzyArithmetic.jl")
+include("Tnorms.jl")
+include("plots.jl")

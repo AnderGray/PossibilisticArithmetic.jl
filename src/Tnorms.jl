@@ -25,7 +25,7 @@ mutable struct tnorm <: AbstractTnorm
     end
 end
 
-function (obj::tnorm)(X,Y, useInterp = false)             # Evaluating the copula
+function (obj :: tnorm)(X, Y, useInterp = false)             # Evaluating the copula
 
     #if (!issorted(X) || !issorted(Y)) throw(ArgumentError("cdf evaluation request must be given in assending order"));end
 
@@ -40,14 +40,14 @@ function (obj::tnorm)(X,Y, useInterp = false)             # Evaluating the copul
 
     xsize, ysize = size(obj.T)
 
-    xIndexLower = Int.(floor.(X .* (xsize-1)) + 1)
-    yIndexLower = Int.(floor.(Y .* (ysize-1)) + 1)
+    xIndexLower = Int.(floor.(X .* (xsize-1)) .+ 1)
+    yIndexLower = Int.(floor.(Y .* (ysize-1)) .+ 1)
 
-    xIndexUpper = Int.(ceil.(X .* (xsize-1)) + 1)
-    yIndexUpper = Int.(ceil.(Y .* (ysize-1)) + 1)
+    xIndexUpper = Int.(ceil.(X .* (xsize-1)) .+ 1)
+    yIndexUpper = Int.(ceil.(Y .* (ysize-1)) .+ 1)
 
-    lowerVals = getindex.(obj.T, xIndexLower, yIndexLower)
-    upperVals = getindex.(obj.T, xIndexUpper, yIndexUpper)
+    lowerVals = getindex(obj.T, xIndexLower, yIndexLower)
+    upperVals = getindex(obj.T, xIndexUpper, yIndexUpper)
     return interval.(lowerVals, upperVals);
 end
 

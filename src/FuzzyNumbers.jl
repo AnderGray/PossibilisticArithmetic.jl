@@ -14,9 +14,9 @@ using ProbabilityBoundsAnalysis
 using PyPlot
 using3D()
 
-import Base: -, +, *, /, //, <, >, ⊆, ^, intersect, issubset, rand, min, max
+import Base: -, +, *, /, //, <, >, ⊆, ^, intersect, issubset, rand, min, max, log, exp, sin, cos, tan
 
-abstract type AbstractFuzzy <: Real end
+abstract type AbstractFuzzy <: Number end
 
 struct FuzzyNumber <: AbstractFuzzy
 
@@ -41,10 +41,11 @@ function (obj::FuzzyNumber)(x, y)
     return mass(obj, x, y)
 end
 
-
 function (obj::FuzzyNumber)(x :: Interval{T}) where T <:Real
     return mass(obj, x)
 end
+
+Fuzzy = FuzzyNumber
 
 FuzzyNumber(lowerbound :: Real, Core :: Real, upperbound :: Real; steps = 200) = FuzzyNumber(interval(Core), interval(lowerbound, upperbound), steps = steps)
 FuzzyNumber(lowerbound :: Real, CoreLeft :: Real, CoreRight :: Real, upperbound :: Real; steps = 200) = FuzzyNumber(interval(CoreLeft, CoreRight), interval(lowerbound, upperbound), steps = steps)

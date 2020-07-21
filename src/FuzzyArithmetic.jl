@@ -34,10 +34,14 @@ end
 ##
 #   https://github.com/JuliaStats/StatsBase.jl/blob/6f9952d5c9a92faa851822b2e06051f7fc59c294/src/hist.jl#L226-L230
 ##
-for op in (:+, :-, :*, :/, :min, :max)
+for op in (:+, :-, :*, :/, :min, :max, :^, :log)
     @eval ($op)( x::FuzzyNumber, y::FuzzyNumber) = levelwise(x, y, op = $op)
     @eval ($op)( x::FuzzyNumber, n::Real) = FuzzyNumber(broadcast($op, x.Membership, n))
     @eval ($op)( n::Real, x::FuzzyNumber) = FuzzyNumber(broadcast($op, n, x.Membership))
+end
+
+for op in (:sin, :cos, :tan, :exp, :log)
+    @eval ($op)( x::FuzzyNumber) = FuzzyNumber(broadcast($op, x.Membership))
 end
 
 #=

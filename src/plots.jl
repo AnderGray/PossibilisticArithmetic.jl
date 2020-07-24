@@ -42,9 +42,11 @@ end
 
 function plot(x :: tnorm; title = "SurfacePlots", pn = 50, fontsize=18, alpha = 0.8)
     A = x.T
-    if x.func == zee; 
-        for i in 1:5
-            A[end-i,1:end-1] .= A[end,1:end-1]; A[1:end-1,end-i] .= A[1:end-1,end]; 
+    if !ismissing(x.func)
+        if x.func == zee; 
+            for i in 1:5
+                A[end-i,1:end-1] .= A[end,1:end-1]; A[1:end-1,end-i] .= A[1:end-1,end]; 
+            end
         end
     end
 

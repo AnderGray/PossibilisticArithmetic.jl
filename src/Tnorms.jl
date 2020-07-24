@@ -14,8 +14,8 @@ abstract type AbstractTnorm <: Real end
 mutable struct tnorm <: AbstractTnorm
 
     T ::  Array{Float64,2}
-    func :: Union{Function,Missing}
-    param :: Union{Float64,Missing}
+    func :: Union{Function, Missing}
+    param :: Union{Float64, Missing}
 
     function tnorm(T = missing; func = missing, param = missing)
 

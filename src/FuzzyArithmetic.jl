@@ -40,7 +40,7 @@ for op in (:+, :-, :*, :/, :min, :max, :^, :log)
     @eval ($op)( n::Real, x::FuzzyNumber) = FuzzyNumber(broadcast($op, n, x.Membership))
 end
 
-for op in (:sin, :cos, :tan, :exp, :log)
+for op in (:-, :sin, :cos, :tan, :exp, :log)
     @eval ($op)( x::FuzzyNumber) = FuzzyNumber(broadcast($op, x.Membership))
 end
 
@@ -52,6 +52,94 @@ end
 =#
 
 
-#function maxMin(x :: FuzzyNumber, y :: FuzzyNumber; op = +); end
+function supMin(x :: FuzzyNumber, y :: FuzzyNumber; op = +)
 
-#function supT(x :: FuzzyNumber, y :: FuzzyNumber; op = +); end
+    zRange = op(x.Range, y.Range);
+
+    xNumMem = length(x.Membership); yNumMem = length(y.Membership);
+
+    zNumMem = max(xNumMem, yNumMem);    # Number of membeship elements Z
+
+    xLeft = left.(x.Membership); xRight = right.(x.Membership);
+    yLeft = left.(y.Membership); yRight = right.(y.Membership);
+
+    xs = [xLeft; reverse(xRight)]; 
+    ys = [yLeft; reverse(yRight)];
+
+    xPos = range(0, 1, length = xNumMem);
+    yPos = range(0, 1, length = yNumMem);
+
+    xPos = [xPos; reverse(xPos)]
+    yPos = [yPos; reverse(yPos)]
+
+    zs   = [map(op, x, y) for x in xs, y in ys]
+    zPos = [min(x, y) for x in xPos, y in yPos]
+
+    zMem = [zRange for i = 1:zNumMem];  # Begin z membership as just a vector of z's range
+
+    zCoreVal = zs[zPos .== 1]           # Find all values in core
+    zCore = interval(minimum(zCoreVal), maximum(zCoreVal));     # Construct core
+
+    zMem[end] = zCore
+
+    zPs = range(0, 1, length = zNumMem)         # alpha values for z
+
+    for i = 2:(zNumMem-1)                       # Iterate through alpha values, and contruct intervals
+        zVals = zs[zPs[i-1] .<= zPos .<= zPs[i+1]]
+        zInt = interval(minimum(zVals), maximum(zVals))
+        zMem[i] = zInt
+    end
+
+    return FuzzyNumber(zMem)
+
+end
+
+function supInd(x :: FuzzyNumber, y :: FuzzyNumber; op = +)
+    
+end
+
+function supGen(x :: FuzzyNumber, y :: FuzzyNumber; op = +)
+
+end
+
+function supT(x :: FuzzyNumber, y :: FuzzyNumber; op = +, T = M():: tnorm) 
+
+    zRange = op(x.Range, y.Range);
+
+    xNumMem = length(x.Membership); yNumMem = length(y.Membership);
+
+    zNumMem = max(xNumMem, yNumMem);    # Number of membeship elements Z
+
+    xLeft = left.(x.Membership); xRight = right.(x.Membership);
+    yLeft = left.(y.Membership); yRight = right.(y.Membership);
+
+    xs = [xLeft; reverse(xRight)]; 
+    ys = [yLeft; reverse(yRight)];
+
+    xPos = range(0, 1, length = xNumMem);
+    yPos = range(0, 1, length = yNumMem);
+
+    xPos = [xPos; reverse(xPos)]
+    yPos = [yPos; reverse(yPos)]
+
+    zs = [map(op, x, y) for x in xs, y in ys]
+    zPos = [T(x,y)[1] for x in xPos, y in yPos]
+
+    zMem = [zRange for i = 1:zNumMem];  # Begin z membership as just a vector of z's range
+
+    zCoreVal = zs[zPos .== 1]           # Find all values in core
+    zCore = interval(minimum(zCoreVal), maximum(zCoreVal));     # Construct core
+
+    zMem[end] = zCore
+
+    zPs = range(0, 1, length = zNumMem)         # alpha values for z
+
+    for i = 2:(zNumMem-1)                       # Iterate through alpha values, and contruct intervals
+        zVals = zs[zPs[i-1] .<= zPos .<= zPs[i+1]]
+        zInt = interval(minimum(zVals), maximum(zVals))
+        zMem[i] = zInt
+    end
+
+    return FuzzyNumber(zMem)
+
+end

@@ -20,18 +20,18 @@ function plot(x :: FuzzyNumber, fill = true; name = missing, col = missing, alph
 
     mems = x.Membership; n = length(mems);
     
-    j = range(0, 1, length = n);
+    j = range(0, 1, length = n+1);
 
     lefts = left.(mems)
-    PyPlot.step(lefts, j, color = edgeCol, where = "pre");
+    PyPlot.step([lefts; lefts[end]], j, color = edgeCol, where = "pre");
 
     rights = right.(mems)
-    PyPlot.step(rights, j, color = edgeCol, where = "pre");
+    PyPlot.step([rights[1]; rights], j, color = edgeCol, where = "post");
 
     PyPlot.plot([x.Core.lo, x.Core.hi] , [1, 1], color = edgeCol);
 
     if fill
-        ax.fill_between([lefts; reverse(rights)], zeros(2 * n), [j; reverse(j)], alpha=alpha, color =fillcol)
+        ax.fill_between([lefts; reverse(rights)], zeros(2 * n), [j[2:end]; reverse(j[2:end])], alpha=alpha, color =fillcol)
     end
 
     xticks(fontsize = fontsize); yticks(fontsize = fontsize)

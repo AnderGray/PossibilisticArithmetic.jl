@@ -77,7 +77,9 @@ function mass( x :: FuzzyNumber, lo :: Real , hi :: Real)
     lefts = left.(x.Membership);
     rights = right.(x.Membership);
 
-    j = range(0, 1, length = length(x.Membership))
+    j = range(0, 1, length = length(x.Membership)+1)
+
+    j = j[2:end];
 
     vals = [lefts; reverse(rights)];
     jj = [j;reverse(j)]

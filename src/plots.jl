@@ -40,7 +40,7 @@ end
 
 
 
-function plot(x :: tnorm; title = "SurfacePlots", pn = 50, fontsize=18, alpha = 0.8)
+function plot(x :: tnorm; name =missing, pn = 50, fontsize=18, alpha = 0.8)
     A = x.T
     if !ismissing(x.func)
         if x.func == zee; 
@@ -61,7 +61,7 @@ function plot(x :: tnorm; title = "SurfacePlots", pn = 50, fontsize=18, alpha = 
 
     z = A[1:Int(nm):end,1:Int(nm):end]
 
-    fig = figure(title,figsize=(10,10))
+    if ismissing(name); fig = figure(figsize=(10,10)) else fig = figure(name,figsize=(10,10));end
     ax = fig.add_subplot(1,1,1,projection="3d")
     #ax = fig.add_subplot(2,1,1)
     plot_surface(xgrid, ygrid, z, rstride=2,edgecolors="k", cstride=2, alpha=alpha, linewidth=0.25, cmap=ColorMap("RdGy"))
@@ -75,7 +75,7 @@ function plot(x :: tnorm; title = "SurfacePlots", pn = 50, fontsize=18, alpha = 
     tight_layout()
 end
 
-function plotContourCdf(x; title = "SurfacePlots",fontsize=18)
+function plotContourCdf(x; name = "SurfacePlots",fontsize=18)
     A = x.T
     m = size(A)[1];
     if m < 200; ppn = m; else ppn = 200; end
@@ -92,5 +92,37 @@ function plotContourCdf(x; title = "SurfacePlots",fontsize=18)
     cp = contour(xgrid, ygrid, z,cmap=ColorMap("coolwarm"),levels = 20)
     xlabel("y",fontsize=fontsize)
     ylabel("x",fontsize=fontsize)
+
+end
+
+
+
+function plotTgen(name =missing)
+
+    x = range(0,1,length = 200)
+
+    Ts = [Tgen(xs,ys) for xs in x, ys in x]
+
+    plot(tnorm(Ts),name = name)
+
+end
+
+function plotTInd(name = missing)
+
+    x = range(0,1,length = 200)
+
+    Ts = [Tind(xs,ys) for xs in x, ys in x]
+
+    plot(tnorm(Ts), name = name)
+
+end
+
+function plotTest(name = missing)
+
+    x = range(0,1,length = 200)
+
+    Ts = TestNorm(x,x)
+
+    plot(tnorm(Ts), name = name)
 
 end

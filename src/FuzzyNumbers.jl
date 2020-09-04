@@ -111,12 +111,24 @@ end
 
 
 function makepbox( x:: FuzzyNumber)
-    return pbox()
+
+    lefts = left.(x.Membership)
+    rights = right.(x.Membership)
+
+    newRights = reverse(rights)
+
+    return pbox(lefts, newRights)
 end
 
 
 function makefuzzy(x :: pbox)
-    return FuzzyNumber()
+
+    lefts = x.u;
+    rights = x.d;
+
+    newRight = reverse(rights);
+    
+    return FuzzyNumber(interval.(lefts, newRight))
 end
 
 function linearInterp(Core:: Interval, Range :: Interval, steps = 200)

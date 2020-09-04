@@ -58,6 +58,10 @@ perf(X, Y)  = [min(x,y) for x in X, y in Y];
 opp(X, Y)   = [max(x+y-1,0) for x in X, y in Y];
 zee(X,Y)    = [x == 1.0 ? y : y == 1.0 ? x : 0.0  for x in X, y in Y ]
 
+coindep(X, Y) = 1 .- [(1-x)*(1-y) for x in X, y in Y];
+coperf(X, Y)  = 1 .- [min((1-x),(1-y)) for x in X, y in Y];
+coopp(X, Y)   = 1 .- [max((1-x)+(1-y)-1,0) for x in X, y in Y];
+cozee(X,Y)    = 1 .- [(1-x) == 1.0 ? y : (1-x) == 1.0 ? x : 0.0  for x in X, y in Y ]
 
 function π( steps = 200 )
     x = range(0, 1, length = steps)
@@ -79,7 +83,30 @@ function Z( steps = 200 )
     return tnorm(zee(x, x), func = zee)
 end
 
+function coπ( steps = 200 )
+    x = range(0, 1, length = steps)
+    return tnorm(coindep(x, x), func = coindep)
+end
 
+function coM( steps = 200 )
+    x = range(0, 1, length = steps)
+    return tnorm(coperf(x, x), func = coperf)
+end
+
+function coW( steps = 200 )
+    x = range(0, 1, length = steps)
+    return tnorm(coopp(x, x), func = coopp)
+end
+
+function coZ( steps = 200 )
+    x = range(0, 1, length = steps)
+    return tnorm(cozee(x, x), func = cozee)
+end
+
+function coZ( steps = 200 )
+    x = range(0, 1, length = steps)
+    return tnorm(cozee(x, x), func = cozee)
+end
 
 
 function Base.show(io::IO, z::tnorm)
@@ -93,6 +120,10 @@ function Base.show(io::IO, z::tnorm)
         if (func == perf); func = "M";end
         if (func == opp); func = "W";end
         if (func == zee); func = "Z";end
+        if (func == coindep); func ="coπ";end
+        if (func == coperf); func = "coM";end
+        if (func == coopp); func = "coW";end
+        if (func == cozee); func = "coZ";end
         statement1 = "$(func)"
     end
 

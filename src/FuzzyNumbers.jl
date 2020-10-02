@@ -8,6 +8,7 @@
 #                                           Author: Ander Gray
 #                                           Email:  ander.gray@liverpool.ac.uk
 ###
+include("../../copulas.jl/src/copulas.jl")
 
 using IntervalArithmetic
 using ProbabilityBoundsAnalysis
@@ -15,14 +16,15 @@ using PyPlot
 using3D()
 
 import Base: -, +, *, /, //, <, >, ⊆, ^, intersect, issubset, rand, min, max, log, exp, sin, cos, tan
+import ProbabilityBoundsAnalysis: pbox, plot, left, right, mean, var
 
 abstract type AbstractFuzzy <: Number end
 
 struct FuzzyNumber <: AbstractFuzzy
 
-    Core :: Interval{<:Real}
-    Range :: Interval{<:Real}
-    Membership :: Array{Interval{<:Real}, 1}
+    Core :: Interval{T} where T <: Real
+    Range :: Interval{T} where T <: Real
+    Membership :: Array{Interval{T}, 1} where T <: Real
 
     function FuzzyNumber(Core = interval(0.5), Range = interval(0, 1), Membership = missing; steps = 200)
         
@@ -59,12 +61,17 @@ function FuzzyNumber( Membership :: Array{Interval{T}, 1}) where T <: Real
 
 end
 
-
+#=
 function isnested( a :: Array{Interval{T}, 1}) where T <: Real
-    leftSorted = issorted( left.(a) ) 
-    rightSorted = issorted( right.(a), rev=true) 
+    leftSorted = issorted( left.(a)) 
+    rightSorted = issorted( right.(a),  rev=true) 
     return leftSorted & rightSorted
 end
+=#
+
+isnested(a :: Array{Interval{T}, 1}) where T <: Real = issorted(a, lt=⊂, rev=true)
+
+iscons( a :: Array{Interval{T}, 1}) where T <: Real = isnested(a)
 
 function mass( x :: FuzzyNumber, lo :: Real , hi :: Real)
 
@@ -97,19 +104,71 @@ function mass( x :: FuzzyNumber, y :: Interval{T}) where T <: Real
     return mass( x, y.lo, y.hi)
 end
 
+function mean( x :: FuzzyNumber) 
+    mems = x.Membership;
+    EL = mean(left.(mems))
+    EU = mean(right.(mems))
+    return interval(EL, EU)
+end
+
 function cut( x :: FuzzyNumber, α :: Real )
 
     if !(α ∈ interval(0, 1) ); throw(ArgumentError("α ∉ [0, 1]\nProvided α = $α")); end
 
-    α = (α *(length( x.Membership ) -1)) + 1; # Scale α by number of elements
+    Mems = deepcopy(x.Membership)
+    push!(Mems, Mems[end])
+
+    α = (α *(length( Mems ) -1)) + 1; # Scale α by number of elements
     
     i = Int(round(α, RoundDown))         # Round down for conservatism
-    return x.Membership[i]
+    return Mems[i]
 end
 
 #α(x :: FuzzyNumber, α :: Real) = cut(x :: FuzzyNumber, α :: Real)
 #alpha(x :: FuzzyNumber, α :: Real) = cut(x :: FuzzyNumber, α :: Real)
 #alphaCut(x :: FuzzyNumber, α :: Real) = cut(x :: FuzzyNumber, α :: Real)
+
+##
+#   Reshapes membership function to match number of steps
+##
+function descritize(x :: FuzzyNumber, steps = 200)
+
+    is = range(0, 1, length= steps)
+
+    NewMems = cut.(x,is)
+
+    return Fuzzy(NewMems)
+
+end
+
+
+function makeCons(x :: Array{Interval{T},1}) where T <: Real  
+
+    x = sort(x,lt = ⊆); x = reverse(x)
+    z = Interval{T}[]
+    for i =1:length(x)-1
+        thisZ = x[i]
+        if x[i] ⊆ x[i+1]; thisZ = hull(x[i],x[i+1]);end
+        push!(z, thisZ)
+    end
+    push!(z,x[end])
+    return z
+end
+
+
+function makeCons1(x :: Array{Interval{T},1}) where T <: Real  
+
+    x = sort(x,lt = ⊆); x = reverse(x)
+    z = Interval{T}[]
+    for i =1:length(x)-1
+        lo = x[i].lo; hi = x[i].hi;
+        if x[i].lo > x[i+1].lo; lo = x[i+1].lo;end
+        if x[i].hi < x[i+1].hi; hi = x[i+1].lo;end
+        push!(z, interval(lo, hi))
+    end
+    push!(z,x[end])
+    return z
+end
 
 
 function makepbox( x:: FuzzyNumber)
@@ -125,12 +184,18 @@ end
 
 function makefuzzy(x :: pbox)
 
+    # Need to check if possible
+
     lefts = x.u;
     rights = x.d;
 
     newRight = reverse(rights);
     
-    return FuzzyNumber(interval.(lefts, newRight))
+    num = Int(floor(length(lefts)/2));
+
+    Fuzz = FuzzyNumber(interval.(lefts[1:num], newRight[1:num]))
+
+    return descritize(Fuzz,200)
 end
 
 function linearInterp(Core:: Interval, Range :: Interval, steps = 200)

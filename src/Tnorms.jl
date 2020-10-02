@@ -11,7 +11,7 @@
 
 abstract type AbstractTnorm <: Real end
 
-mutable struct tnorm <: AbstractTnorm
+mutable struct tnorm <: AbstractCopula
 
     T ::  Array{Float64,2}
     func :: Union{Function, Missing}

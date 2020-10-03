@@ -144,15 +144,15 @@ end
 
 function makeCons(x :: Array{Interval{T},1}) where T <: Real  
 
-    x = sort(x,lt = ⊆); x = reverse(x)
+    x = sort(x,lt = ⊂); #x = reverse(x)
     z = Interval{T}[]
     for i =1:length(x)-1
         thisZ = x[i]
-        if x[i] ⊆ x[i+1]; thisZ = hull(x[i],x[i+1]);end
+        if !(x[i] ⊆ x[i+1]); thisZ = hull(x[i],x[i+1]);end
         push!(z, thisZ)
     end
     push!(z,x[end])
-    return z
+    return reverse(z)
 end
 
 

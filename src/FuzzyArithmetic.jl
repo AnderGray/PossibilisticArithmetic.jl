@@ -94,6 +94,104 @@ function supT(x :: FuzzyNumber, y :: FuzzyNumber; op = +, T = min)
 
 end
 
+
+function mobiusTransform2D(x :: Fuzzy, y::Fuzzy, C)
+
+    xMems = x.Membership; yMems = y.Membership;
+    xCap  = range(1,0, length=length(xMems))
+    yCap  = range(1,0, length=length(yMems))
+
+    cartProd = Array{Interval{Float64},1}[]
+    masses = Float64[]
+
+    for i = 1:length(xMems)-1
+        for j = 1:length(yMems)-1
+            thisMass = C(xCap[i],yCap[j]) - C(xCap[i+1],yCap[j]) - C(xCap[i],yCap[j+1]) + C(xCap[i+1],yCap[j+1])
+            push!(masses, thisMass[1])
+            push!(cartProd, [xMems[i], yMems[j]])
+        end
+    end
+    return masses, cartProd
+end
+
+
+function mobiusCopula(x :: Fuzzy, y::Fuzzy; op = +, C = π())
+
+    if C.func == opp; return levelwiseOpp(x, y, op);end
+
+    zNum = max(length(x.Membership), length(y.Membership))
+    masses, cartProd = mobiusTransform2D(x, y, C)
+    
+    zs = [op(ints[1],ints[2]) for ints in cartProd]
+
+    zUniq = unique(zs)
+    
+    membership = [sum(masses[ zs .⊇ this ]) for this in zUniq]
+
+    zPos = range(0,1, length=zNum+1)
+
+    zMems = Interval{Float64}[]
+    #push!(zMems, zUniq[1])
+    
+    for i = 1:length(zPos)-1
+        theseOnes =  zPos[i] .<= membership .< zPos[i+1]
+        if !any(theseOnes); 
+            thisInt = zMems[end]
+        else
+            thisInt = hull(zUniq[theseOnes])
+        end
+        push!(zMems, thisInt);
+    end
+    zs1 = sort(zMems, lt = ⊂, rev = true)
+    #zs1 = makeCons(zMems)
+    #f = Fuzzy(zs1)
+    return Fuzzy(zs1)
+end
+
+function levelwiseOpp(x::Fuzzy, y :: Fuzzy, op = +)
+    xMems = x.Membership; yMems = y.Membership;
+
+    yMems = reverse(yMems)
+    zMems = op.(xMems, yMems)
+
+    zMems = sort(zMems, lt = ⊂, rev = true)
+    #zMems = makeCons(zMems)
+    return Fuzzy(zMems)
+end
+
+function levelwiseCopula(x :: FuzzyNumber, y :: FuzzyNumber; op = +, C = π())
+
+    xMems = x.Membership; yMems = y.Membership;
+    numX = length(xMems); numY = length(yMems);
+    xPos  = range(1,0,length=numX); yPos = range(1, 0, length = numY);
+
+    zMems = op.(xMems, yMems);
+    zPos  = getindex.(C.(xPos, yPos), 1)
+
+    zPosNew = range(0,1,length=length(zMems)+1)
+
+    zMemsNew = Interval{Float64}[]
+
+    zRange = zMems[end];
+    push!(zMemsNew, zRange);
+
+    for i = 2:length(zPosNew)-1
+        theseOnes =  zPosNew[i] .<= zPos .<= zPosNew[i+1]
+        if !any(theseOnes); 
+            thisInt = zMemsNew[end]
+            
+        else
+            thisInt = hull(zMems[theseOnes])
+        end
+        push!(zMemsNew, thisInt);
+    end
+    
+    zMemsNew = reverse(zMemsNew)
+    return Fuzzy(zMemsNew)
+
+
+end
+
 Tgen(x,y) = min(min(1,2*x), min(1,2*y))
 Tind(x,y) = min(1 - (1-x)^2, 1 - (1-y)^2)
 

@@ -69,8 +69,9 @@ function isnested( a :: Array{Interval{T}, 1}) where T <: Real
 end
 =#
 
-isnested(a :: Array{Interval{T}, 1}) where T <: Real = issorted(a, lt=⊂, rev=true)
+#isnested(a :: Array{Interval{T}, 1}) where T <: Real = issorted(a, lt=⊂, rev=true)
 
+isnested(a :: Array{Interval{T}, 1}) where T <: Real = all(a[2:end] .⊆ a[1:end-1])
 iscons( a :: Array{Interval{T}, 1}) where T <: Real = isnested(a)
 
 function mass( x :: FuzzyNumber, lo :: Real , hi :: Real)
@@ -144,8 +145,24 @@ end
 
 function makeCons(x :: Array{Interval{T},1}) where T <: Real  
 
+    x = sort(x,lt = ⊂); x = reverse(x)
+    z = Interval{Float64}[]
+    for i =1:length(x)-1
+        lo = x[i+1].lo; hi = x[i+1].hi;
+        if x[i].lo < lo; lo = x[i].lo;end
+        if x[i].hi > hi; hi = x[i].hi;end
+        push!(z, interval(lo, hi))
+    end
+    push!(z,x[end])
+    if !isnested(z) z= makeCons(z);end
+    return z
+end
+
+
+function makeCons1(x :: Array{Interval{T},1}) where T <: Real  
+
     x = sort(x,lt = ⊂); #x = reverse(x)
-    z = Interval{T}[]
+    z = Interval{Float64}[]
     for i =1:length(x)-1
         thisZ = x[i]
         if !(x[i] ⊆ x[i+1]); thisZ = hull(x[i],x[i+1]);end
@@ -155,20 +172,22 @@ function makeCons(x :: Array{Interval{T},1}) where T <: Real
     return reverse(z)
 end
 
+dia(x, y) = diam(x) < diam(y)
 
-function makeCons1(x :: Array{Interval{T},1}) where T <: Real  
+function makeCons2(x :: Array{Interval{T},1}) where T <: Real  
 
-    x = sort(x,lt = ⊆); x = reverse(x)
-    z = Interval{T}[]
+    x = sort(x,rev = true);
+    z = Interval{Float64}[]
     for i =1:length(x)-1
         lo = x[i].lo; hi = x[i].hi;
         if x[i].lo > x[i+1].lo; lo = x[i+1].lo;end
-        if x[i].hi < x[i+1].hi; hi = x[i+1].lo;end
+        if x[i].hi < x[i+1].hi; hi = x[i+1].hi;end
         push!(z, interval(lo, hi))
     end
     push!(z,x[end])
     return z
 end
+
 
 
 function makepbox( x:: FuzzyNumber)

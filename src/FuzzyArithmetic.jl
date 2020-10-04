@@ -98,15 +98,15 @@ end
 function mobiusTransform2D(x :: Fuzzy, y::Fuzzy, C)
 
     xMems = x.Membership; yMems = y.Membership;
-    xCap  = range(1,0, length=length(xMems))
-    yCap  = range(1,0, length=length(yMems))
+    xBel  = range(1,0, length=length(xMems))
+    yBel  = range(1,0, length=length(yMems))
 
     cartProd = Array{Interval{Float64},1}[]
     masses = Float64[]
 
     for i = 1:length(xMems)-1
         for j = 1:length(yMems)-1
-            thisMass = C(xCap[i],yCap[j]) - C(xCap[i+1],yCap[j]) - C(xCap[i],yCap[j+1]) + C(xCap[i+1],yCap[j+1])
+            thisMass = C(xBel[i],yBel[j]) - C(xBel[i+1],yBel[j]) - C(xBel[i],yBel[j+1]) + C(xBel[i+1],yBel[j+1])
             push!(masses, thisMass[1])
             push!(cartProd, [xMems[i], yMems[j]])
         end
@@ -114,10 +114,10 @@ function mobiusTransform2D(x :: Fuzzy, y::Fuzzy, C)
     return masses, cartProd
 end
 
+function sigmaFuzzy(x :: Fuzzy, y::Fuzzy; op = +, C = π())
 
-function mobiusCopula(x :: Fuzzy, y::Fuzzy; op = +, C = π())
-
-    if C.func == opp; return levelwiseOpp(x, y, op);end
+    if C.func == opp; return levelwiseOpp(x, y, op=op);end
+    if C.func == perf; return levelwise(x, y,op= op);end
 
     zNum = max(length(x.Membership), length(y.Membership))
     masses, cartProd = mobiusTransform2D(x, y, C)
@@ -142,24 +142,81 @@ function mobiusCopula(x :: Fuzzy, y::Fuzzy; op = +, C = π())
         end
         push!(zMems, thisInt);
     end
-    zs1 = sort(zMems, lt = ⊂, rev = true)
-    #zs1 = makeCons(zMems)
-    #f = Fuzzy(zs1)
-    return Fuzzy(zs1)
+
+    if !isnested(zMems); zMems= makeCons(zMems);end
+    return Fuzzy(zMems)
 end
 
-function levelwiseOpp(x::Fuzzy, y :: Fuzzy, op = +)
+
+
+function sigmaFuzzy2(x :: Fuzzy, y::Fuzzy; op = +, C = π())
+
+    #if C.func == opp; return levelwiseOpp(x, y, op);end
+
+    zNum = max(length(x.Membership), length(y.Membership))
+    masses, cartProd = mobiusTransform2D(x, y, C)
+    
+    zs = [op(ints[1],ints[2]) for ints in cartProd]
+
+    zUniq = unique(zs)
+    
+    membership = [sum(masses[ zs .⊇ this ]) for this in zUniq]
+
+    zPos = range(0,1, length=zNum+1)
+
+    p = sortperm(membership)
+    membership = membership[p]
+    zUniq = zUniq[p];
+    zMems = [zUniq[searchsortedfirst(membership, i)] for i in zPos[1:end-1]]
+    
+    if !isnested(zMems); zMems= makeCons(zMems);end
+    return Fuzzy(zMems)
+end
+
+
+
+function sigmaFuzzy3(x :: Fuzzy, y::Fuzzy; op = +, C = π())
+
+    #if C.func == opp; return levelwiseOpp(x, y, op);end
+
+    zNum = max(length(x.Membership), length(y.Membership))
+    masses, cartProd = mobiusTransform2D(x, y, C)
+    
+    zs = [op(ints[1],ints[2]) for ints in cartProd]
+
+    zUniq = unique(zs)
+    
+    membership = [sum(masses[ zs .⊇ this ]) for this in zUniq]
+
+    zPos = range(1,0, length=zNum+1)
+
+    p = sortperm(membership)
+    membership = membership[p]
+    zUniq = zUniq[p];
+    zMems = [zUniq[searchsortedlast(membership, i)] for i in zPos[1:end-1]]
+    
+    push!(zMems, zs[1])
+
+    if !isnested(zMems); zMems= makeCons(zMems);end
+    return Fuzzy(zMems)
+end
+
+
+
+function levelwiseOpp(x::Fuzzy, y :: Fuzzy; op = +)
     xMems = x.Membership; yMems = y.Membership;
 
     yMems = reverse(yMems)
     zMems = op.(xMems, yMems)
 
-    zMems = sort(zMems, lt = ⊂, rev = true)
-    #zMems = makeCons(zMems)
+    #zMems = sort(zMems, lt = ⊂, rev = true)
+    zMems = makeCons(zMems)
     return Fuzzy(zMems)
 end
 
-function levelwiseCopula(x :: FuzzyNumber, y :: FuzzyNumber; op = +, C = π())
+
+
+function tauFuzzy(x :: FuzzyNumber, y :: FuzzyNumber; op = +, C = π())
 
     xMems = x.Membership; yMems = y.Membership;
     numX = length(xMems); numY = length(yMems);
@@ -172,14 +229,46 @@ function levelwiseCopula(x :: FuzzyNumber, y :: FuzzyNumber; op = +, C = π())
 
     zMemsNew = Interval{Float64}[]
 
-    zRange = zMems[end];
-    push!(zMemsNew, zRange);
+    #zRange = zMems[end];
+    #push!(zMemsNew, zRange);
 
-    for i = 2:length(zPosNew)-1
+    for i = 1:length(zPosNew)-1
+        theseOnes =  zPosNew[i] .<= zPos .<= zPosNew[i+1]
+        if !any(theseOnes); 
+           thisInt = zMemsNew[end]
+        else
+           thisInt = hull(zMems[theseOnes])
+        end
+        push!(zMemsNew, thisInt);
+    end
+
+    zMemsNew = reverse(zMemsNew)
+    return Fuzzy(zMemsNew)
+
+
+end
+
+
+function tauFuzzy3(x :: FuzzyNumber, y :: FuzzyNumber; op = +, C = π())
+
+    xMems = x.Membership; yMems = y.Membership;
+    numX = length(xMems); numY = length(yMems);
+    xBel  = range(1,0,length=numX); yBel = range(1, 0, length = numY);
+
+    zMems = op.(xMems, yMems);
+    zPos  = getindex.(C.(xBel, yBel), 1)
+
+    zPosNew = range(0,1,length=length(zMems)+1)
+
+    zMemsNew = Interval{Float64}[]
+
+    zRange = zMems[end];
+    #push!(zMemsNew, zRange);
+
+    for i = 1:length(zPosNew)-1
         theseOnes =  zPosNew[i] .<= zPos .<= zPosNew[i+1]
         if !any(theseOnes); 
             thisInt = zMemsNew[end]
-            
         else
             thisInt = hull(zMems[theseOnes])
         end
@@ -187,10 +276,38 @@ function levelwiseCopula(x :: FuzzyNumber, y :: FuzzyNumber; op = +, C = π())
     end
     
     zMemsNew = reverse(zMemsNew)
+    #if !isnested(zMemsNew); zMemsNew= makeCons(zMemsNew);end
     return Fuzzy(zMemsNew)
 
+end
+
+function tauFuzzy2(x :: FuzzyNumber, y :: FuzzyNumber; op = +, C = π())
+
+    xMems = x.Membership; yMems = y.Membership;
+    numX = length(xMems); numY = length(yMems);
+    xBel  = range(1,0,length=numX); yBel = range(1, 0, length = numY);
+
+    zMems = op.(xMems, yMems);
+    zPos  = getindex.(C.(xBel, yBel), 1)
+
+    zPosNew = range(0,1,length=length(zMems)+1)
+
+    zMemsNew = Interval{Float64}[]
+
+    zRange = zMems[end];
+    #push!(zMemsNew, zRange);
+
+    p = sortperm(zPos)
+    zPos = zPos[p]
+    zMems = zMems[p];
+    zMemsNew = [zMems[searchsortedfirst(zPos, i)] for i in zPosNew[1:end-1]]
+
+    zMemsNew = reverse(zMemsNew)
+    if !isnested(zMemsNew); zMemsNew= makeCons(zMemsNew);end
+    return Fuzzy(zMemsNew)
 
 end
+
 
 Tgen(x,y) = min(min(1,2*x), min(1,2*y))
 Tind(x,y) = min(1 - (1-x)^2, 1 - (1-y)^2)

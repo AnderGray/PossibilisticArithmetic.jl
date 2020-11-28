@@ -141,13 +141,13 @@ function plotJoint(x :: Fuzzy, y ::Fuzzy, C ; name = missing, alpha = 0.6, fonts
     xs = xs[1:SUB:end]
     ys = ys[1:SUB:end]
 
-    xPos = range(0, 1, length = length(xLeft));
-    yPos = range(0, 1, length = length(yLeft));
+    xPos = range(1, 0, length = length(xLeft));
+    yPos = range(1, 0, length = length(yLeft));
 
     xPos = [xPos; reverse(xPos)]
     yPos = [yPos; reverse(yPos)]
 
-    zPos = [C(x,y)[1] for x in xPos, y in yPos]
+    zPos = [1-C(x,y)[1] for x in xPos, y in yPos]
 
     zPos = convert(Array{Float64,2}, zPos)
 

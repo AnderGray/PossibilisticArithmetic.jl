@@ -114,26 +114,26 @@ function mobiusTransform2D(x :: Fuzzy, y::Fuzzy, C)
     return masses, cartProd
 end
 
-function sigmaFuzzy(x :: Fuzzy, y::Fuzzy; op = +, C = π())
+function sigmaFuzzy1(x :: Fuzzy, y::Fuzzy; op = +, C = π())
 
     if C.func == opp; return levelwiseOpp(x, y, op=op);end
-    if C.func == perf; return levelwise(x, y,op= op);end
+    if C.func == perf; return levelwise(x, y, op= op);end
 
     zNum = max(length(x.Membership), length(y.Membership))
-    masses, cartProd = mobiusTransform2D(x, y, C)
+    masses, cartProd = mobiusTransform2D(x, y, C)       # Get carteesian prod and masses from Möbius
     
-    zs = [op(ints[1],ints[2]) for ints in cartProd]
+    zs = [op(ints[1],ints[2]) for ints in cartProd]     # Evaluate carteesian product with interval arithm
 
-    zUniq = unique(zs)
+    zUniq = unique(zs)                                  # Remove repeated intervals for efficiency
     
-    membership = [sum(masses[ zs .⊇ this ]) for this in zUniq]
+    membership = [sum(masses[ zs .⊇ this ]) for this in zUniq]  # Find beliefs
 
     zPos = range(0,1, length=zNum+1)
 
     zMems = Interval{Float64}[]
-    #push!(zMems, zUniq[1])
-    
-    for i = 1:length(zPos)-1
+    push!(zMems, zUniq[1])
+                        
+    for i = 2:length(zPos)-1                                # Find alpha cuts for return Fuzzy
         theseOnes =  zPos[i] .<= membership .< zPos[i+1]
         if !any(theseOnes); 
             thisInt = zMems[end]
@@ -142,40 +142,41 @@ function sigmaFuzzy(x :: Fuzzy, y::Fuzzy; op = +, C = π())
         end
         push!(zMems, thisInt);
     end
-
+    #zMems = sort(zMems, lt = ⊂, rev= true)
     if !isnested(zMems); zMems= makeCons(zMems);end
     return Fuzzy(zMems)
 end
 
 
 
-function sigmaFuzzy2(x :: Fuzzy, y::Fuzzy; op = +, C = π())
+function sigmaFuzzy(x :: Fuzzy, y::Fuzzy; op = +, C = π())
 
     #if C.func == opp; return levelwiseOpp(x, y, op);end
 
     zNum = max(length(x.Membership), length(y.Membership))
-    masses, cartProd = mobiusTransform2D(x, y, C)
+    masses, cartProd = mobiusTransform2D(x, y, C)       # Get carteesian prod and masses from Möbius
     
-    zs = [op(ints[1],ints[2]) for ints in cartProd]
+    zs = [op(ints[1],ints[2]) for ints in cartProd]     # Evaluate carteesian product with interval arithm
 
-    zUniq = unique(zs)
+    zUniq = unique(zs)                                  # Remove repeated intervals for efficiency
     
-    membership = [sum(masses[ zs .⊇ this ]) for this in zUniq]
+    membership = [sum(masses[ zs .⊇ this ]) for this in zUniq]  # Find beliefs
 
     zPos = range(0,1, length=zNum+1)
 
-    p = sortperm(membership)
+    p = sortperm(membership)                                    # sort according to membership
     membership = membership[p]
     zUniq = zUniq[p];
-    zMems = [zUniq[searchsortedfirst(membership, i)] for i in zPos[1:end-1]]
+    zMems = [zUniq[searchsortedfirst(membership, i)] for i in zPos[1:end-1]]    # Find alpha cuts for return Fuzzy
     
     if !isnested(zMems); zMems= makeCons(zMems);end
     return Fuzzy(zMems)
 end
 
+sigmaFuzzy(x :: FuzzyNumber, y :: Real; op = +, C = π()) = sigmaFuzzy(x, makefuzzy(y); op = op, C = C)
+sigmaFuzzy(x :: Real, y :: FuzzyNumber; op = +, C = π()) = sigmaFuzzy(makefuzzy(x), y; op = op, C = C)
 
-
-function sigmaFuzzy3(x :: Fuzzy, y::Fuzzy; op = +, C = π())
+function sigmaFuzzy3(x :: FuzzyNumber, y::FuzzyNumber; op = +, C = π())
 
     #if C.func == opp; return levelwiseOpp(x, y, op);end
 
@@ -203,7 +204,7 @@ end
 
 
 
-function levelwiseOpp(x::Fuzzy, y :: Fuzzy; op = +)
+function levelwiseOpp(x :: FuzzyNumber, y :: FuzzyNumber; op = +)
     xMems = x.Membership; yMems = y.Membership;
 
     yMems = reverse(yMems)
@@ -220,10 +221,10 @@ function tauFuzzy(x :: FuzzyNumber, y :: FuzzyNumber; op = +, C = π())
 
     xMems = x.Membership; yMems = y.Membership;
     numX = length(xMems); numY = length(yMems);
-    xPos  = range(1,0,length=numX); yPos = range(1, 0, length = numY);
+    xBel  = range(1,0,length=numX); yBel = range(1, 0, length = numY);
 
     zMems = op.(xMems, yMems);
-    zPos  = getindex.(C.(xPos, yPos), 1)
+    zBel  = getindex.(C.(xBel, yBel), 1)
 
     zPosNew = range(0,1,length=length(zMems)+1)
 
@@ -233,7 +234,7 @@ function tauFuzzy(x :: FuzzyNumber, y :: FuzzyNumber; op = +, C = π())
     #push!(zMemsNew, zRange);
 
     for i = 1:length(zPosNew)-1
-        theseOnes =  zPosNew[i] .<= zPos .<= zPosNew[i+1]
+        theseOnes =  zPosNew[i] .<= zBel .<= zPosNew[i+1]
         if !any(theseOnes); 
            thisInt = zMemsNew[end]
         else
@@ -247,6 +248,9 @@ function tauFuzzy(x :: FuzzyNumber, y :: FuzzyNumber; op = +, C = π())
 
 
 end
+
+tauFuzzy(x :: FuzzyNumber, y :: Real; op = +, C = π()) = tauFuzzy(x, makefuzzy(y); op = +, C = π())
+tauFuzzy(x :: Real, y :: FuzzyNumber; op = +, C = π()) = tauFuzzy(makefuzzy(x),y; op = +, C = π())
 
 
 function tauFuzzy3(x :: FuzzyNumber, y :: FuzzyNumber; op = +, C = π())
@@ -335,14 +339,14 @@ function supCop(x :: FuzzyNumber, y :: FuzzyNumber; op = +, C = min)
     xs = [xLeft; reverse(xRight)]; 
     ys = [yLeft; reverse(yRight)];
 
-    xPos = range(0, 1, length = xNumMem);
-    yPos = range(0, 1, length = yNumMem);
+    xPos = range(1, 0, length = xNumMem);
+    yPos = range(1, 0, length = yNumMem);
 
     xPos = [xPos; reverse(xPos)]
     yPos = [yPos; reverse(yPos)]
 
     zs = [map(op, x, y) for x in xs, y in ys]
-    zPos = [C(x,y)[1] for x in xPos, y in yPos]
+    zPos = [1 - C(x,y)[1] for x in xPos, y in yPos]
 
     zMem = [zRange for i = 1:zNumMem];  # Begin z membership as just a vector of z's range
 
@@ -353,7 +357,7 @@ function supCop(x :: FuzzyNumber, y :: FuzzyNumber; op = +, C = min)
     zPs = range(0, 1, length = zNumMem)         # alpha values for z
 
     for i = 2:(zNumMem-1)                       # Iterate through alpha values, and contruct intervals
-        zVals = zs[ .!(zPs[i-1] .<= zPos .<= zPs[i+1])]
+        zVals = zs[(zPs[i-1] .<= zPos .<= zPs[i+1])]
         zInt = interval(minimum(zVals), maximum(zVals))
         zMem[i] = zInt
     end

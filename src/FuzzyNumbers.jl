@@ -15,10 +15,10 @@ using ProbabilityBoundsAnalysis
 using PyPlot
 using3D()
 
-import Base: -, +, *, /, //, <, >, ⊆, ^, intersect, issubset, rand, min, max, log, exp, sin, cos, tan
-import ProbabilityBoundsAnalysis: pbox, plot, left, right, mean, var
+import Base: -, +, *, /, //, <, >, ⊆, ^, intersect, issubset, rand, min, max, log, exp, sin, cos, tan, isequal
+import ProbabilityBoundsAnalysis: pbox, plot, left, right, mean, var, env
 
-abstract type AbstractFuzzy <: Number end
+abstract type AbstractFuzzy <: Real end
 
 struct FuzzyNumber <: AbstractFuzzy
 
@@ -72,6 +72,7 @@ end
 #isnested(a :: Array{Interval{T}, 1}) where T <: Real = issorted(a, lt=⊂, rev=true)
 
 isnested(a :: Array{Interval{T}, 1}) where T <: Real = all(a[2:end] .⊆ a[1:end-1])
+#isnested(a :: Array{Interval{T}, 1}) where T <: Real = true
 iscons( a :: Array{Interval{T}, 1}) where T <: Real = isnested(a)
 
 function mass( x :: FuzzyNumber, lo :: Real , hi :: Real)
@@ -188,6 +189,12 @@ function makeCons2(x :: Array{Interval{T},1}) where T <: Real
     return z
 end
 
+function env(x :: FuzzyNumber, y :: FuzzyNumber)
+
+    Mems = hull.(x.Membership, y.Membership)
+    return FuzzyNumber(Mems)
+
+end
 
 
 function makepbox( x:: FuzzyNumber)
@@ -217,10 +224,17 @@ function makefuzzy(x :: pbox)
     return descritize(Fuzz,200)
 end
 
+function makefuzzy(x :: Union{Real, Interval}, steps = 200) 
+    Mems = [interval(x) for i=1:steps]
+    return Fuzzy(Mems)
+end
+
 function linearInterp(Core:: Interval, Range :: Interval, steps = 200)
     return interval.(range(Range.lo, Core.lo, length = steps), range(Range.hi, Core.hi, length = steps))
 end
 
+
+isfuzzy(x) = typeof(x) <: FuzzyNumber
 
 function Base.show(io::IO, z::FuzzyNumber)
 

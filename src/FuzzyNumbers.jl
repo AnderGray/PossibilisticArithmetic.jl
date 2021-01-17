@@ -1,4 +1,4 @@
-###
+    ###
 #   This file is a part of FuzzyArithmetic.jl package
 #
 #   This file defines a FuzzyNumber type, and various supporting functions
@@ -55,7 +55,7 @@ FuzzyNumber(lowerbound :: Real, Core :: Interval{<:Real}, upperbound :: Real; st
 
 function FuzzyNumber( Membership :: Array{Interval{T}, 1}) where T <: Real
 
-    if !isnested(Membership); throw(ArgumentError("Invalid Membership function, intervals must be nested from Range (Membership[1]) to Core (Membership[end])")); end
+    #if !isnested(Membership); throw(ArgumentError("Invalid Membership function, intervals must be nested from Range (Membership[1]) to Core (Membership[end])")); end
     Core = Membership[end]; Range = Membership[1];
     return FuzzyNumber(Core, Range, Membership, steps = length(Membership))
 
@@ -100,6 +100,13 @@ function mass( x :: FuzzyNumber, lo :: Real , hi :: Real)
 
     return interval(Ness, Poss)
 
+end
+
+function membership(F :: FuzzyNumber, x ::Union{Float64, Int64})
+    mems = F.Membership
+    here = findlast(x .∈ mems)
+    if isnothing(here) return 0;end
+    return here/(length(mems)+1)
 end
 
 function mass( x :: FuzzyNumber, y :: Interval{T}) where T <: Real  
@@ -229,6 +236,25 @@ function makefuzzy(x :: Union{Real, Interval}, steps = 200)
     return Fuzzy(Mems)
 end
 
+function ecdf2fuzzy(x)
+    xSort = sort(x)
+    l = length(x)
+    if iseven(l)
+        mid = Integer(l/2)
+        lefts = xSort[1:mid]
+        rights = reverse(xSort[mid+1:end])
+        Mems = interval.(lefts, rights)
+    else   
+        mid = Integer((l-1)/2)
+        lefts = xSort[1:mid]
+        rights = reverse(xSort[mid+2:end])
+        core = Interval(xSort[mid+1])
+        Mems = interval.(lefts,rights)
+        push!(Mems, core)
+    end
+    return Fuzzy(Mems)
+end
+
 function linearInterp(Core:: Interval, Range :: Interval, steps = 200)
     return interval.(range(Range.lo, Core.lo, length = steps), range(Range.hi, Core.hi, length = steps))
 end
@@ -250,3 +276,4 @@ end
 include("FuzzyArithmetic.jl")
 include("Tnorms.jl")
 include("plots.jl")
+include("inference.jl")

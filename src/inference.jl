@@ -182,19 +182,6 @@ function poss2Fuzzy(xs, poss, Ndes = 200)
     return Fuzzy(inIntervals)
 end
 
-for i = 2:Ndes
-
-    these = findall(inMems[i-1] .<= sampsMems .<= inMems[i])
-
-    if isempty(these); 
-        push!(inIntervals, inIntervals[end]);
-    else
-        inLow = minimum(samps[these]); inHi = maximum(samps[these])
-        inInt = interval(inLow, inHi)
-        push!(inIntervals, inInt)
-    end
-end
-
 ##
 #   A is a Nsamples × Ndim matrix of independent possibility values
 ##

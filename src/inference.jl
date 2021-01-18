@@ -91,21 +91,24 @@ function invertUnivScatter(f :: Function, outFuzzys :: FuzzyNumber, InputRange, 
 end
 
 
+##
+#   Outdata : Nsamples × Ndims
+##
 function invertSampling(f, outData, InputRange, Nsamples = 10^4)
 
     Ndims = length(InputRange)
 
     samps = rand(Nsamples, Ndims) .* (right.(InputRange) - left.(InputRange))' .+left.(InputRange)';
 
-    outFuzzys = [ecdf2fuzzy(outData[:,i]) for i = 1:size(outData)[2]]
-    outSamps = f(samps)
+    outFuzzys = [ecdf2fuzzy(outData[i,:]) for i = 1:size(outData)[1]]
+    outSamps = f(samps')
 
     NdimsOut = length(outFuzzys)
 
     sampsMems = zeros(Nsamples, NdimsOut)
 
     for i = 1:NdimsOut
-        sampsMems[:,i] = membership.(outFuzzys[i], outSamps[:,i])
+        sampsMems[:,i] = membership.(outFuzzys[i], outSamps[i,:])
     end
 
     joints = indepJoint(sampsMems)
@@ -178,10 +181,6 @@ function poss2Fuzzy(xs, poss, Ndes = 200)
 
     return Fuzzy(inIntervals)
 end
-
-
-inIntervals = Interval{Float64}[]
-push!(inIntervals, inRange)
 
 for i = 2:Ndes
 

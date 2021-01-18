@@ -21,9 +21,14 @@
         writedlm(io, e)
     end
 
-    run(`./uqsim 1 aleatory.dat epistemic.dat`)
-    ys = reshape(readdlm("yout"), 5001,Nsamples)
-    return abs.(fft(ys))[1:50,:]
+    try 
+        run(`./uqsim 1 aleatory.dat epistemic.dat`)
+    finally
+
+        ys = reshape(readdlm("yout"),Nsamples,5001)'
+        return abs.(fft(ys))[1:50,:]
+        
+    end
 end
 
 @everywhere function invertSampling(f, outData, InputRange, id, Nsamples = 10^4)

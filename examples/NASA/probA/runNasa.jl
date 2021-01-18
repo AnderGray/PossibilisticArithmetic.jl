@@ -17,7 +17,7 @@ function runNasaY(a, e)
 
     run(`./uqsim 1 aleatory.dat epistemic.dat`)
 
-    return reshape(readdlm("yout"), 5001,Nsamples)
+    return reshape(readdlm("yout"), Nsamples,5001)'
 end
 
 function runNasaY(Nsamples)
@@ -36,7 +36,7 @@ function runNasaY(Nsamples)
 
     run(`./uqsim 1 aleatory.dat epistemic.dat`)
 
-    return reshape(readdlm("yout"), 5001,Nsamples)
+    return reshape(readdlm("yout"), Nsamples, 5001)'
 end
 
 function runNasaYFFT(Nsamples)
@@ -54,7 +54,7 @@ function runNasaYFFT(Nsamples)
     end
 
     run(`./uqsim 1 aleatory.dat epistemic.dat`)
-    ys = reshape(readdlm("yout"), 5001,Nsamples)
+    ys = reshape(readdlm("yout"),Nsamples, 5001)'
 
     return abs.(fft(ys))[1:50,:]
 end
@@ -75,7 +75,7 @@ function runNasaYFFT2(A)
     end
 
     run(`./uqsim 1 aleatory.dat epistemic.dat`)
-    ys = reshape(readdlm("yout"), 5001,Nsamples)
+    ys = reshape(readdlm("yout"),5001,Nsamples)'
 
     return abs.(fft(ys))[1:50,:]
 end
@@ -104,7 +104,7 @@ end
 
     run(`./uqsim 1 aleatory.dat epistemic.dat`)
     cd("..")
-    return reshape(readdlm("$dirname/yout"), 5001, Nsamples)
+    return reshape(readdlm("$dirname/yout"), Nsamples, 5001)';
 end
 
 @everywhere function runNasaYDir2(Nsamples, id)

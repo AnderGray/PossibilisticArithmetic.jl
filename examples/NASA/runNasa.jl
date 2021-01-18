@@ -10,8 +10,10 @@ function runNasaY(a , e)
         writedlm(io, e)
     end
 
-    run(`./uqsim 1 aleatory.dat epistemic.dat design.dat`)
-    
-    return reshape(readdlm("yout"), 5001)
+    try
+        run(`./uqsim 1 aleatory.dat epistemic.dat`)
+    finally
+        return reshape(readdlm("yout"), 5001)
+    end
 
 end

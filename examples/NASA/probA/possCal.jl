@@ -2,7 +2,7 @@
 @everywhere include("readData.jl")
 @everywhere include("runNasa.jl")
 @everywhere include("../../../src/FuzzyNumbers.jl")
-
+@everywhere using FFTW
 
 @everywhere function runNasaYFFT2(A, id)
 
@@ -70,8 +70,8 @@ yFFT = abs.(fft(yData))[1:50,:]
 
 inRange = interval(0,2)×interval(0,2)×interval(0,2)×interval(0,2)×interval(0,2)×interval(0,2)×interval(0,2)×interval(0,2)×interval(0,2)
 
-Ncores = 10
+Ncores = 2
 
-jobs = [Distributed.@spawnat :any invertSampling(runNasaYFFT2, yFFT, inRange, i, 10^4) for i in 1:Ncores]
+jobs = [Distributed.@spawnat :any invertSampling(runNasaYFFT2, yFFT, inRange, i, 100) for i in 1:Ncores]
 
 s = [fetch(j) for j in jobs]

@@ -1,4 +1,4 @@
-    ###
+###
 #   This file is a part of FuzzyArithmetic.jl package
 #
 #   This file defines a FuzzyNumber type, and various supporting functions
@@ -8,19 +8,20 @@
 #                                           Author: Ander Gray
 #                                           Email:  ander.gray@liverpool.ac.uk
 ###
-include("../../copulas.jl/src/copulas.jl")
 
-using IntervalArithmetic
+#using IntervalArithmetic
 using ProbabilityBoundsAnalysis
 using PyPlot
+using IntervalUnionArithmetic
 using3D()
+using BivariateCopulas
 
 import Base: -, +, *, /, //, <, >, ⊆, ^, intersect, issubset, rand, min, max, log, exp, sin, cos, tan, isequal
 import ProbabilityBoundsAnalysis: pbox, plot, left, right, mean, var, env
 
-abstract type AbstractFuzzy <: Real end
+abstract type AbstractPoss <: Real end
 
-struct FuzzyNumber <: AbstractFuzzy
+struct FuzzyNumber <: AbstractPoss
 
     Core :: Interval{T} where T <: Real
     Range :: Interval{T} where T <: Real
@@ -166,6 +167,19 @@ function makeCons(x :: Array{Interval{T},1}) where T <: Real
     return z
 end
 
+function makeConsDom(mem :: Array{Interval{T},1}, masses ) where T <: Real  
+
+    lefts = left.(mem);
+    rights = right.(mem);
+
+    subPos = interval(lefts, rights)
+
+    NewMembership = [sum(masses[ mem .⊇ this ]) for this in subPos]  # Find beliefs
+
+    
+
+
+end
 
 function makeCons1(x :: Array{Interval{T},1}) where T <: Real  
 
@@ -274,6 +288,7 @@ end
 
 
 include("FuzzyArithmetic.jl")
-include("Tnorms.jl")
+#include("Tnorms.jl")
+include("PossibilityNumbers.jl")
 include("plots.jl")
 include("inference.jl")

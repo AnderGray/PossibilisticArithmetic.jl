@@ -11,7 +11,7 @@
 
 
 # For now we will use abstract type. When library is finished will use concrete
-function levelwise(x :: FuzzyNumber, y :: FuzzyNumber; op = +)
+function levelwise(x :: AbstractPoss, y :: AbstractPoss; op = +)
 
     memX = x.Membership; memY = y.Membership;
 
@@ -36,13 +36,13 @@ end
 ##
 
 for op in (:+, :-, :*, :/, :min, :max, :^, :log, :<, :>)
-    @eval ($op)( x::FuzzyNumber, y::FuzzyNumber) = levelwise(x, y, op = $op)
-    @eval ($op)( x::FuzzyNumber, n::Real) = FuzzyNumber(broadcast($op, x.Membership, n))
-    @eval ($op)( n::Real, x::FuzzyNumber) = FuzzyNumber(broadcast($op, n, x.Membership))
+    @eval ($op)( x::AbstractPoss, y::AbstractPoss) = levelwise(x, y, op = $op)
+    @eval ($op)( x::AbstractPoss, n::Real) = FuzzyNumber(broadcast($op, x.Membership, n))
+    @eval ($op)( n::Real, x::AbstractPoss) = FuzzyNumber(broadcast($op, n, x.Membership))
 end
 
 for op in (:-, :sin, :cos, :tan, :exp, :log)
-    @eval ($op)( x::FuzzyNumber) = FuzzyNumber(broadcast($op, x.Membership))
+    @eval ($op)( x::AbstractPoss) = FuzzyNumber(broadcast($op, x.Membership))
 end
 
 #=
@@ -95,7 +95,7 @@ function supT(x :: FuzzyNumber, y :: FuzzyNumber; op = +, T = min)
 end
 
 
-function mobiusTransform2D(x :: Fuzzy, y::Fuzzy, C)
+function mobiusTransform2D(x :: Fuzzy, y :: Fuzzy, C)
 
     xMems = x.Membership; yMems = y.Membership;
     xBel  = range(1,0, length=length(xMems))
@@ -114,7 +114,7 @@ function mobiusTransform2D(x :: Fuzzy, y::Fuzzy, C)
     return masses, cartProd
 end
 
-function sigmaFuzzy1(x :: Fuzzy, y::Fuzzy; op = +, C = π())
+function sigmaFuzzy(x :: Fuzzy, y::Fuzzy; op = +, C = Pi())
 
     if C.func == opp; return levelwiseOpp(x, y, op=op);end
     if C.func == perf; return levelwise(x, y, op= op);end
@@ -126,6 +126,13 @@ function sigmaFuzzy1(x :: Fuzzy, y::Fuzzy; op = +, C = π())
 
     zUniq = unique(zs)                                  # Remove repeated intervals for efficiency
     
+    #=
+    lefts = left.(zUniq);
+    rights = sort(right.(zUniq),rev = true);
+
+    subPos = interval.(lefts, rights)
+    =#
+
     membership = [sum(masses[ zs .⊇ this ]) for this in zUniq]  # Find beliefs
 
     zPos = range(0,1, length=zNum+1)
@@ -149,7 +156,7 @@ end
 
 
 
-function sigmaFuzzy(x :: Fuzzy, y::Fuzzy; op = +, C = π())
+function sigmaFuzzy1(x :: Fuzzy, y::Fuzzy; op = +, C = Pi())
 
     #if C.func == opp; return levelwiseOpp(x, y, op);end
 
@@ -160,7 +167,12 @@ function sigmaFuzzy(x :: Fuzzy, y::Fuzzy; op = +, C = π())
 
     zUniq = unique(zs)                                  # Remove repeated intervals for efficiency
     
-    membership = [sum(masses[ zs .⊇ this ]) for this in zUniq]  # Find beliefs
+    lefts = left.(zUniq);
+    rights = sort(right.(zUniq), rev= true);
+
+    subPos = interval.(lefts, rights)
+
+    membership = [sum(masses[ zs .⊇ this ]) for this in subPos]  # Find beliefs
 
     zPos = range(0,1, length=zNum+1)
 
@@ -176,7 +188,7 @@ end
 sigmaFuzzy(x :: FuzzyNumber, y :: Real; op = +, C = π()) = sigmaFuzzy(x, makefuzzy(y); op = op, C = C)
 sigmaFuzzy(x :: Real, y :: FuzzyNumber; op = +, C = π()) = sigmaFuzzy(makefuzzy(x), y; op = op, C = C)
 
-function sigmaFuzzy3(x :: FuzzyNumber, y::FuzzyNumber; op = +, C = π())
+function sigmaFuzzy3(x :: FuzzyNumber, y::FuzzyNumber; op = +, C = Pi())
 
     #if C.func == opp; return levelwiseOpp(x, y, op);end
 
@@ -204,7 +216,7 @@ end
 
 
 
-function levelwiseOpp(x :: FuzzyNumber, y :: FuzzyNumber; op = +)
+function levelwiseOpp(x :: AbstractPoss, y :: AbstractPoss; op = +)
     xMems = x.Membership; yMems = y.Membership;
 
     yMems = reverse(yMems)
@@ -217,7 +229,7 @@ end
 
 
 
-function tauFuzzy(x :: FuzzyNumber, y :: FuzzyNumber; op = +, C = π())
+function tauFuzzy(x :: AbstractPoss, y :: AbstractPoss; op = +, C = Pi())
 
     xMems = x.Membership; yMems = y.Membership;
     numX = length(xMems); numY = length(yMems);
@@ -244,16 +256,16 @@ function tauFuzzy(x :: FuzzyNumber, y :: FuzzyNumber; op = +, C = π())
     end
 
     zMemsNew = reverse(zMemsNew)
-    return Fuzzy(zMemsNew)
+    return FuzzyNumber(zMemsNew)
 
 
 end
 
-tauFuzzy(x :: FuzzyNumber, y :: Real; op = +, C = π()) = tauFuzzy(x, makefuzzy(y); op = +, C = π())
-tauFuzzy(x :: Real, y :: FuzzyNumber; op = +, C = π()) = tauFuzzy(makefuzzy(x),y; op = +, C = π())
+tauFuzzy(x :: FuzzyNumber, y :: Real; op = +, C = π()) = tauFuzzy(x, makefuzzy(y); op = +, C = Pi())
+tauFuzzy(x :: Real, y :: FuzzyNumber; op = +, C = π()) = tauFuzzy(makefuzzy(x),y; op = +, C = Pi())
 
 
-function tauFuzzy3(x :: FuzzyNumber, y :: FuzzyNumber; op = +, C = π())
+function tauFuzzy3(x :: FuzzyNumber, y :: FuzzyNumber; op = +, C = Pi())
 
     xMems = x.Membership; yMems = y.Membership;
     numX = length(xMems); numY = length(yMems);
@@ -285,7 +297,7 @@ function tauFuzzy3(x :: FuzzyNumber, y :: FuzzyNumber; op = +, C = π())
 
 end
 
-function tauFuzzy2(x :: FuzzyNumber, y :: FuzzyNumber; op = +, C = π())
+function tauFuzzy2(x :: FuzzyNumber, y :: FuzzyNumber; op = +, C = Pi())
 
     xMems = x.Membership; yMems = y.Membership;
     numX = length(xMems); numY = length(yMems);

@@ -68,6 +68,63 @@ function plotOld(x :: FuzzyNumber, fill = true; name = missing, col = missing, a
 end
 
 
+function plot(x :: PossNumber, fill = true; name = missing, col = missing, alpha = 0.2, fontsize = 18)
+
+    edgeCol = "red"; fillcol = "grey"
+    if !(ismissing(col)); edgeCol = fillcol = col;end
+
+    if ismissing(name); fig = figure(figsize=(10,10))else; fig = figure(name,figsize=(10,10));end
+    ax = fig.add_subplot()
+
+    mems = x.Membership; n = length(mems);
+    
+    j = range(0, 1, length = n+1);
+
+    lefts = left.(mems)
+    maxLength = maximum(length.(lefts))
+    for l in lefts
+        while length(l) < maxLength
+            push!(l, NaN)
+        end
+    end
+
+    these = reduce(hcat, lefts)
+    
+    for i =1:maxLength
+        index = findall( .!isnan.(these[i,:]))
+        PyPlot.step([these[i,index]; these[i,index[end]]], [j[index]; j[index[end]+1]], color = edgeCol, where = "pre");
+    end
+
+    rights = right.(mems)
+    maxLength = maximum(length.(rights))
+    for r in rights
+        while length(r) < maxLength
+            push!(r, NaN)
+        end
+    end
+
+    these = reduce(hcat, rights)
+
+    for i =1:maxLength
+        index = findall( .!isnan.(these[i,:]))
+        PyPlot.step([these[i,index[1]]; these[i,index]],[j[index]; j[index[end]+1]], color = edgeCol, where = "post");
+    end
+
+    [PyPlot.plot([this.lo, this.hi] , [1, 1], color = edgeCol) for this in x.Core.v];
+
+    # Plot the other coreners
+    #=
+    if fill
+        ax.fill_between([lefts; reverse(rights)], zeros(2 * n), [j[2:end]; reverse(j[2:end])], alpha=alpha, color =fillcol)
+    end
+    =#
+    xticks(fontsize = fontsize); yticks(fontsize = fontsize)
+    xlabel("Range",fontsize = fontsize); ylabel("α",fontsize=fontsize);
+    
+end
+
+
+#=
 function plot(x :: tnorm; name =missing, pn = 50, fontsize=18, alpha = 0.8, title = missing)
     A = x.T
     if !ismissing(x.func)
@@ -123,7 +180,7 @@ function plotContourCdf(x; name = "SurfacePlots",fontsize=18)
     ylabel("x",fontsize=fontsize)
 
 end
-
+=#
 function plotJoint(x :: Fuzzy, y ::Fuzzy, C ; name = missing, alpha = 0.6, fontsize = 22, title = missing)
 
     xNumMem = length(x.Membership); yNumMem = length(y.Membership);

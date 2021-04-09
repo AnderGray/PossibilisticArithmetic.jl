@@ -40,6 +40,19 @@ function PossNumber( Membership :: Vector{IntervalU{T}}) where T <: Real
 
 end
 
+
+function ∪(x :: Union{PossNumber,FuzzyNumber}, y ::Union{PossNumber,FuzzyNumber})
+    
+    zMems = .∪(x.Membership, y.Membership)
+    return PossNumber(zMems)
+end
+
+function ∪(x :: FuzzyNumber, y ::FuzzyNumber)
+    
+    zMems = .∪(x.Membership, y.Membership)
+    return PossNumber(zMems)
+end
+
 FuzzyNumber(Membership :: Vector{IntervalU{T}}) where T <: Real = PossNumber(Membership)
 
 function membership(F :: PossNumber, x ::Union{Float64, Int64})

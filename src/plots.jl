@@ -82,36 +82,70 @@ function plot(x :: PossNumber, fill = true; name = missing, col = missing, alpha
 
     lefts = left.(mems)
     maxLength = maximum(length.(lefts))
-    for l in lefts
-        while length(l) < maxLength
-            push!(l, NaN)
+
+    newLeft = [NaN for i = 1:maxLength, j = 1:n]
+
+    coreL = lefts[end]
+
+    for i = 1:n
+        for l in lefts[i]
+            index = findfirst(l .<= coreL)
+            newLeft[index,i] = l
         end
     end
 
-    these = reduce(hcat, lefts)
-    
     for i =1:maxLength
-        index = findall( .!isnan.(these[i,:]))
-        PyPlot.step([these[i,index]; these[i,index[end]]], [j[index]; j[index[end]+1]], color = edgeCol, where = "pre");
+        index = findall( .!isnan.(newLeft[i,:]))
+        PyPlot.step([newLeft[i,index]; newLeft[i,index[end]]], [j[index]; j[index[end]+1]], color = edgeCol, where = "pre");
     end
 
     rights = right.(mems)
     maxLength = maximum(length.(rights))
-    for r in rights
-        while length(r) < maxLength
-            push!(r, NaN)
+
+    newRight = [NaN for i = 1:maxLength, j = 1:n]
+
+    coreR = lefts[end]
+
+    for i = 1:n
+        for r in rights[i]
+            index = findlast(r .>= coreR)
+            newRight[index,i] = r
         end
     end
 
-    these = reduce(hcat, rights)
-
     for i =1:maxLength
-        index = findall( .!isnan.(these[i,:]))
-        PyPlot.step([these[i,index[1]]; these[i,index]],[j[index]; j[index[end]+1]], color = edgeCol, where = "post");
+        index = findall( .!isnan.(newRight[i,:]))
+        PyPlot.step([newRight[i,index[1]]; newRight[i,index]],[j[index]; j[index[end]+1]], color = edgeCol, where = "post");
     end
 
     [PyPlot.plot([this.lo, this.hi] , [1, 1], color = edgeCol) for this in x.Core.v];
 
+    cornerLeft = newLeft[2:end,:]
+    cornerRight = newRight[1:end-1,:]
+
+    for i = 1:size(cornerLeft,1)
+        index = findfirst( .!isnan.(cornerLeft[i,:]))
+        PyPlot.plot([cornerLeft[i,index], cornerRight[i,index]] , [j[index], j[index]], color = edgeCol)
+    end
+
+
+    #=
+    lens = length.(getfield.(mems,:v))
+
+    maxLength= maximum(lens)
+    prev = []
+    for i = 2:maxLength
+        this = findfirst(lens .== i)
+        new = mems[this]
+        setdiff!(new.v,prev)
+        prev = mems[this].v
+        newc = IntervalUnionArithmetic.complement(new)
+
+        low = newc[2].lo
+        high = newc[2].hi
+        PyPlot.plot([low, high] , [j[this], j[this]], color = edgeCol)
+    end
+    =#
     # Plot the other coreners
     #=
     if fill

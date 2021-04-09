@@ -216,7 +216,7 @@ end
 
 
 
-function levelwiseOpp(x :: AbstractPoss, y :: AbstractPoss; op = +)
+function levelwiseOpp(x :: FuzzyNumber, y :: FuzzyNumber; op = +)
     xMems = x.Membership; yMems = y.Membership;
 
     yMems = reverse(yMems)
@@ -229,7 +229,7 @@ end
 
 
 
-function tauFuzzy(x :: AbstractPoss, y :: AbstractPoss; op = +, C = Pi())
+function tauFuzzy(x :: FuzzyNumber, y :: FuzzyNumber; op = +, C = Pi())
 
     xMems = x.Membership; yMems = y.Membership;
     numX = length(xMems); numY = length(yMems);

@@ -14,9 +14,9 @@ using ProbabilityBoundsAnalysis
 using PyPlot
 using IntervalUnionArithmetic
 using3D()
-using BivariateCopulas
+using BivariateCopulas: M, W, Pi, Gaussian
 
-import Base: -, +, *, /, //, <, >, ⊆, ^, intersect, issubset, rand, min, max, log, exp, sin, cos, tan, isequal
+import Base: -, +, *, /, //, <, >, ⊆, ^, intersect, issubset, rand, min, max, log, exp, sin, cos, tan, isequal, ∪
 import ProbabilityBoundsAnalysis: pbox, plot, left, right, mean, var, env
 
 abstract type AbstractPoss <: Real end
@@ -290,5 +290,6 @@ end
 include("FuzzyArithmetic.jl")
 #include("Tnorms.jl")
 include("PossibilityNumbers.jl")
+include("PossArithmetic.jl")
 include("plots.jl")
 include("inference.jl")

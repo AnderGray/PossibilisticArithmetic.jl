@@ -19,7 +19,7 @@ function plot(x :: FuzzyNumber, fill = true; name = missing, col = missing, alph
     ax = fig.add_subplot()
 
     mems = x.Membership; n = length(mems);
-    
+
     j = range(0, 1, length = n+1);
 
     lefts = left.(mems)
@@ -47,7 +47,7 @@ function plotOld(x :: FuzzyNumber, fill = true; name = missing, col = missing, a
     ax = fig.add_subplot()
 
     mems = x.Membership; n = length(mems);
-    
+
     j = range(0, 1, length = n);
 
     lefts = left.(mems)
@@ -66,7 +66,7 @@ function plotOld(x :: FuzzyNumber, fill = true; name = missing, col = missing, a
     xlabel("Range",fontsize = fontsize); ylabel("α",fontsize=fontsize);
 
 end
-
+#=
 
 function plot(x :: PossNumber, fill = true; name = missing, col = missing, alpha = 0.2, fontsize = 18)
 
@@ -77,7 +77,7 @@ function plot(x :: PossNumber, fill = true; name = missing, col = missing, alpha
     ax = fig.add_subplot()
 
     mems = x.Membership; n = length(mems);
-    
+
     j = range(0, 1, length = n+1);
 
     lefts = left.(mems)
@@ -154,17 +154,17 @@ function plot(x :: PossNumber, fill = true; name = missing, col = missing, alpha
     =#
     xticks(fontsize = fontsize); yticks(fontsize = fontsize)
     xlabel("Range",fontsize = fontsize); ylabel("α",fontsize=fontsize);
-    
-end
 
+end
+=#
 
 #=
 function plot(x :: tnorm; name =missing, pn = 50, fontsize=18, alpha = 0.8, title = missing)
     A = x.T
     if !ismissing(x.func)
-        if x.func == zee; 
+        if x.func == zee;
             for i in 1:5
-                A[end-i,1:end-1] .= A[end,1:end-1]; A[1:end-1,end-i] .= A[1:end-1,end]; 
+                A[end-i,1:end-1] .= A[end,1:end-1]; A[1:end-1,end-i] .= A[1:end-1,end];
             end
         end
     end
@@ -226,7 +226,7 @@ function plotJoint(x :: Fuzzy, y ::Fuzzy, C ; name = missing, alpha = 0.6, fonts
     xLeft = left.(x.Membership); xRight = right.(x.Membership);
     yLeft = left.(y.Membership); yRight = right.(y.Membership);
 
-    xs = [xLeft; reverse(xRight)]; 
+    xs = [xLeft; reverse(xRight)];
     ys = [yLeft; reverse(yRight)];
 
     xs = xs[1:SUB:end]
@@ -275,7 +275,7 @@ function plotJointSubsets(x :: Fuzzy, y ::Fuzzy, C ; name = missing, alpha = 0.6
     xLeft = left.(x.Membership); xRight = right.(x.Membership);
     yLeft = left.(y.Membership); yRight = right.(y.Membership);
 
-    xs = [xLeft; reverse(xRight)]; 
+    xs = [xLeft; reverse(xRight)];
     ys = [yLeft; reverse(yRight)];
 
     xs = xs[1:SUB:end]
@@ -309,7 +309,7 @@ function plotJointSubsets(x :: Fuzzy, y ::Fuzzy, C ; name = missing, alpha = 0.6
     xMems = xMems[1:subx:end]; yMems = yMems[1:suby:end];
 
     for i = 1:NumInts
-        xlo = xMems[i].lo; xhi = xMems[i].hi; 
+        xlo = xMems[i].lo; xhi = xMems[i].hi;
         ylo = yMems[i].lo; yhi = yMems[i].hi;
 
         xs = range(xlo,xhi,length= 20);

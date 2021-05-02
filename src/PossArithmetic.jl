@@ -21,7 +21,7 @@ function levelwise(x :: AbstractPoss, y :: AbstractPoss; op = +)
 
 end
 
-function levelwiseOpp(x :: FuzzyNumber, y :: FuzzyNumber; op = +)
+function levelwiseOpp(x :: PossNumber, y :: PossNumber; op = +)
     xMems = x.Membership; yMems = y.Membership;
 
     yMems = reverse(yMems)
@@ -125,3 +125,6 @@ function tauFuzzy(x :: AbstractPoss, y :: AbstractPoss; op = +, C = Pi())
     zMemsNew = reverse(zMemsNew)
     return PossNumber(zMemsNew)
 end
+
+
+∩(x :: PossNumber, y::PossNumber) = PossNumber( .∩(x.Membership, y.Membership)[1:100])

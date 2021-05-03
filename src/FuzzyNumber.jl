@@ -14,13 +14,18 @@
 
 Basic type in FuzzyArithmetic. Defines a set of nested intervals (Membership), starting from Range (Membership[1]) to the core (Membership[end])
 
-Used to bound a set of probability distribution functions
+Used to bound a set of probability distribution functions in the Imprecise Probability sense
 
 # Constructors
 * `FuzzyNumber(Core :: Interval, Range :: Interval; steps :: Integer)                   => Give Core and Range, Membership is a linear interpolation`
 * `FuzzyNumber(Membership :: Array{Interval{T}, 1} where T <: Real                      => Give Membership`
-# `FuzzyNumber(lowerbound :: Real, Core :: Real, upperbound :: Real; steps :: Integer)  => Give Range as Reals`
-# `FuzzyNumber(lowerbound :: Real, Core :: Real, upperbound :: Real; steps :: Integer)  => Give Range as bounds`
+* `FuzzyNumber(lowerbound :: Real, Core :: Real, upperbound :: Real; steps :: Integer)      => Give Range as Reals`
+* `FuzzyNumber(lowerbound :: Real, Core :: Real, upperbound :: Real; steps :: Integer)      => Give Core and Range as reals`
+
+Alias: Fuzzy
+
+See also: [`mass`](@ref), [`membership`](@ref), [`Fuzzy`](@ref), [`plot`](@ref), [`cut`](@ref), [`mean`](@ref)
+
 """
 struct FuzzyNumber <: AbstractPoss
 
@@ -41,6 +46,7 @@ end
 function (obj::FuzzyNumber)(x :: Interval{T}) where T <:Real
     return mass(obj, x)
 end
+
 
 Fuzzy = FuzzyNumber
 
@@ -94,7 +100,7 @@ function membership(F :: FuzzyNumber, x ::Union{Float64, Int64})
     mems = F.Membership
     here = findlast(x .∈ mems)
     if isnothing(here) return 0;end
-    return here/(length(mems)+1)
+    return here/(length(mems))
 end
 
 function mean( x :: FuzzyNumber)

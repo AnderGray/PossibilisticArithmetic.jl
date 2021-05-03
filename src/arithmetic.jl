@@ -60,6 +60,88 @@ end
 /( x :: FuzzyNumber, y :: FuzzyNumber)  = levelwise(x, y, op = /)
 =#
 
+function mobiusTransform2D(x :: Fuzzy, y :: Fuzzy, C)
+
+    xMems = x.Membership; yMems = y.Membership;
+    xBel  = range(1,0, length=length(xMems))
+    yBel  = range(1,0, length=length(yMems))
+
+    cartProd = Array{Interval{Float64},1}[]
+    masses = Float64[]
+
+    for i = 1:length(xMems)-1
+        for j = 1:length(yMems)-1
+            thisMass = C(xBel[i],yBel[j]) - C(xBel[i+1],yBel[j]) - C(xBel[i],yBel[j+1]) + C(xBel[i+1],yBel[j+1])
+            push!(masses, thisMass[1])
+            push!(cartProd, [xMems[i], yMems[j]])
+        end
+    end
+    return masses, cartProd
+end
+
+function sigmaFuzzy(x :: Fuzzy, y::Fuzzy; op = +, C = Pi())
+
+    if C == W; return levelwiseOpp(x, y, op=op);end
+    if C == M; return levelwise(x, y, op= op);end
+
+    zNum = max(length(x.Membership), length(y.Membership))
+    masses, cartProd = mobiusTransform2D(x, y, C)       # Get carteesian prod and masses from Möbius
+
+    zs = [op(ints[1],ints[2]) for ints in cartProd]     # Evaluate carteesian product with interval arithm
+
+    return DSS2Fuzzy(zs, masses, steps =  max(length(x.Membership), length(y.Membership)))
+end
+
+sigmaFuzzy(x :: FuzzyNumber, y :: Real; op = +, C = π()) = sigmaFuzzy(x, makefuzzy(y); op = op, C = C)
+sigmaFuzzy(x :: Real, y :: FuzzyNumber; op = +, C = π()) = sigmaFuzzy(makefuzzy(x), y; op = op, C = C)
+
+
+
+function tauFuzzy(x :: FuzzyNumber, y :: FuzzyNumber; op = +, C = Pi())
+
+    numX = length(x.Membership); numY = length(y.Membership);
+
+    if numX != numY
+        num = max(numX, numY)
+        x = descritize(x,num); y = descritize(y,num)
+    end
+
+
+    xMems = x.Membership; yMems = y.Membership;
+    numX = length(xMems); numY = length(yMems);
+    xBel  = range(1,0,length=numX); yBel = range(1, 0, length = numY);
+
+    zMems = op.(xMems, yMems);
+    zBel  = getindex.(C.(xBel, yBel), 1)
+
+    zPosNew = range(0,1,length=length(zMems)+1)
+
+    zMemsNew = Interval{Float64}[]
+
+    for i = 1:length(zPosNew)-1
+        theseOnes =  zPosNew[i] .<= zBel .<= zPosNew[i+1]
+        if !any(theseOnes);
+           thisInt = zMemsNew[end]
+        else
+           thisInt = hull(zMems[theseOnes])
+        end
+        push!(zMemsNew, thisInt);
+    end
+
+    zMemsNew = reverse(zMemsNew)
+    return FuzzyNumber(zMemsNew)
+
+
+end
+
+tauFuzzy(x :: FuzzyNumber, y :: Real; op = +, C = π()) = tauFuzzy(x, makefuzzy(y); op = +, C = Pi())
+tauFuzzy(x :: Real, y :: FuzzyNumber; op = +, C = π()) = tauFuzzy(makefuzzy(x),y; op = +, C = Pi())
+
+
+
+##
+#   OldSchool Williamson & Downs T-norm convolution
+##
 function supT(x :: FuzzyNumber, y :: FuzzyNumber; op = +, T = min)
 
     zRange = op(x.Range, y.Range);
@@ -102,38 +184,17 @@ function supT(x :: FuzzyNumber, y :: FuzzyNumber; op = +, T = min)
 
 end
 
+Tgen(x,y) = min(min(1,2*x), min(1,2*y))
+Tind(x,y) = min(1 - (1-x)^2, 1 - (1-y)^2)
 
-function mobiusTransform2D(x :: Fuzzy, y :: Fuzzy, C)
+TestNorm(x, y) = 2 .* perf(x,y) .- opp(x,y)
 
-    xMems = x.Membership; yMems = y.Membership;
-    xBel  = range(1,0, length=length(xMems))
-    yBel  = range(1,0, length=length(yMems))
+supMin(x:: FuzzyNumber, y :: FuzzyNumber;op=+) = supT(x, y, op=op, T = min)
+supGen(x:: FuzzyNumber, y :: FuzzyNumber;op=+) = supT(x, y, op=op, T = Tgen)
+supInd(x:: FuzzyNumber, y :: FuzzyNumber;op=+) = supT(x, y, op=op, T = Tind)
 
-    cartProd = Array{Interval{Float64},1}[]
-    masses = Float64[]
 
-    for i = 1:length(xMems)-1
-        for j = 1:length(yMems)-1
-            thisMass = C(xBel[i],yBel[j]) - C(xBel[i+1],yBel[j]) - C(xBel[i],yBel[j+1]) + C(xBel[i+1],yBel[j+1])
-            push!(masses, thisMass[1])
-            push!(cartProd, [xMems[i], yMems[j]])
-        end
-    end
-    return masses, cartProd
-end
-
-function sigmaFuzzy(x :: Fuzzy, y::Fuzzy; op = +, C = Pi())
-
-    if C == W; return levelwiseOpp(x, y, op=op);end
-    if C == M; return levelwise(x, y, op= op);end
-
-    zNum = max(length(x.Membership), length(y.Membership))
-    masses, cartProd = mobiusTransform2D(x, y, C)       # Get carteesian prod and masses from Möbius
-
-    zs = [op(ints[1],ints[2]) for ints in cartProd]     # Evaluate carteesian product with interval arithm
-
-    return DSS2Fuzzy(zs, masses, steps =  max(length(x.Membership), length(y.Membership)))
-end
+#=  Old codes
 
 function sigmaFuzzyOld(x :: Fuzzy, y::Fuzzy; op = +, C = Pi())
 
@@ -205,8 +266,6 @@ function sigmaFuzzy1(x :: Fuzzy, y::Fuzzy; op = +, C = Pi())
     return Fuzzy(zMems)
 end
 
-sigmaFuzzy(x :: FuzzyNumber, y :: Real; op = +, C = π()) = sigmaFuzzy(x, makefuzzy(y); op = op, C = C)
-sigmaFuzzy(x :: Real, y :: FuzzyNumber; op = +, C = π()) = sigmaFuzzy(makefuzzy(x), y; op = op, C = C)
 
 function sigmaFuzzy3(x :: FuzzyNumber, y::FuzzyNumber; op = +, C = Pi())
 
@@ -235,48 +294,6 @@ function sigmaFuzzy3(x :: FuzzyNumber, y::FuzzyNumber; op = +, C = Pi())
 end
 
 
-function tauFuzzy(x :: FuzzyNumber, y :: FuzzyNumber; op = +, C = Pi())
-
-    numX = length(x.Membership); numY = length(y.Membership);
-
-    if numX != numY
-        num = max(numX, numY)
-        x = descritize(x,num); y = descritize(y,num)
-    end
-
-
-    xMems = x.Membership; yMems = y.Membership;
-    numX = length(xMems); numY = length(yMems);
-    xBel  = range(1,0,length=numX); yBel = range(1, 0, length = numY);
-
-    zMems = op.(xMems, yMems);
-    zBel  = getindex.(C.(xBel, yBel), 1)
-
-    zPosNew = range(0,1,length=length(zMems)+1)
-
-    zMemsNew = Interval{Float64}[]
-
-    #zRange = zMems[end];
-    #push!(zMemsNew, zRange);
-
-    for i = 1:length(zPosNew)-1
-        theseOnes =  zPosNew[i] .<= zBel .<= zPosNew[i+1]
-        if !any(theseOnes);
-           thisInt = zMemsNew[end]
-        else
-           thisInt = hull(zMems[theseOnes])
-        end
-        push!(zMemsNew, thisInt);
-    end
-
-    zMemsNew = reverse(zMemsNew)
-    return FuzzyNumber(zMemsNew)
-
-
-end
-
-tauFuzzy(x :: FuzzyNumber, y :: Real; op = +, C = π()) = tauFuzzy(x, makefuzzy(y); op = +, C = Pi())
-tauFuzzy(x :: Real, y :: FuzzyNumber; op = +, C = π()) = tauFuzzy(makefuzzy(x),y; op = +, C = Pi())
 
 
 function tauFuzzy3(x :: FuzzyNumber, y :: FuzzyNumber; op = +, C = Pi())
@@ -337,17 +354,6 @@ function tauFuzzy2(x :: FuzzyNumber, y :: FuzzyNumber; op = +, C = Pi())
     return Fuzzy(zMemsNew)
 
 end
-
-
-Tgen(x,y) = min(min(1,2*x), min(1,2*y))
-Tind(x,y) = min(1 - (1-x)^2, 1 - (1-y)^2)
-
-TestNorm(x, y) = 2 .* perf(x,y) .- opp(x,y)
-
-supMin(x:: FuzzyNumber, y :: FuzzyNumber;op=+) = supT(x, y, op=op, T = min)
-supGen(x:: FuzzyNumber, y :: FuzzyNumber;op=+) = supT(x, y, op=op, T = Tgen)
-supInd(x:: FuzzyNumber, y :: FuzzyNumber;op=+) = supT(x, y, op=op, T = Tind)
-
 
 
 
@@ -436,3 +442,6 @@ function supCop2(x :: FuzzyNumber, y :: FuzzyNumber; op = +, C = min)
     return zPs, zMems
 
 end
+
+
+=#

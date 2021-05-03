@@ -10,6 +10,7 @@ ProbabilityBoundsAnalysis = "cd73f0b2-6f06-11ea-242f-83a09de6a7cf"
 PyPlot = "d330b81b-6aea-500a-939a-2ce795aea3ee"
 
 [compat]
+PyPlot = "2.9"
 BivariateCopulas = "0.1"
 ProbabilityBoundsAnalysis = "0.2"
 IntervalArithmetic = "0.18"

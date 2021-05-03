@@ -20,6 +20,8 @@ function plot(x :: FuzzyNumber, fill = true; name = missing, col = missing, alph
 
     mems = x.Membership; n = length(mems);
 
+    Core = x.Membership[end];
+
     j = range(0, 1, length = n+1);
 
     lefts = left.(mems)
@@ -28,7 +30,7 @@ function plot(x :: FuzzyNumber, fill = true; name = missing, col = missing, alph
     rights = right.(mems)
     PyPlot.step([rights[1]; rights], j, color = edgeCol, where = "post");
 
-    PyPlot.plot([x.Core.lo, x.Core.hi] , [1, 1], color = edgeCol);
+    PyPlot.plot([Core.lo, Core.hi] , [1, 1], color = edgeCol);
 
     if fill
         ax.fill_between([lefts; reverse(rights)], zeros(2 * n), [j[2:end]; reverse(j[2:end])], alpha=alpha, color =fillcol)
@@ -48,6 +50,8 @@ function plotOld(x :: FuzzyNumber, fill = true; name = missing, col = missing, a
 
     mems = x.Membership; n = length(mems);
 
+    Core = x.Membership[end];
+
     j = range(0, 1, length = n);
 
     lefts = left.(mems)
@@ -56,7 +60,7 @@ function plotOld(x :: FuzzyNumber, fill = true; name = missing, col = missing, a
     rights = right.(mems)
     PyPlot.step(rights, j, color = edgeCol, where = "pre");
 
-    PyPlot.plot([x.Core.lo, x.Core.hi] , [1, 1], color = edgeCol);
+    PyPlot.plot([Core.lo, Core.hi] , [1, 1], color = edgeCol);
 
     if fill
         ax.fill_between([lefts; reverse(rights)], zeros(2 * n), [j; reverse(j)], alpha=alpha, color =fillcol)

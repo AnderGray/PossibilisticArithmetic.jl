@@ -11,3 +11,5 @@ PyPlot = "d330b81b-6aea-500a-939a-2ce795aea3ee"
 
 [compat]
 BivariateCopulas = "0.1"
+ProbabilityBoundsAnalysis = "0.2"
+IntervalArithmetic = "0.18"

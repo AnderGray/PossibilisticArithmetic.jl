@@ -9,22 +9,28 @@
 #                                           Email:  ander.gray@liverpool.ac.uk
 ###
 
+"""
+    struct FuzzyNumber <: AbstractPoss
+
+Basic type in FuzzyArithmetic. Defines a set of nested intervals (Membership), starting from Range (Membership[1]) to the core (Membership[end])
+
+Used to bound a set of probability distribution functions
+
+# Constructors
+* `FuzzyNumber(Core :: Interval, Range :: Interval; steps :: Integer)                   => Give Core and Range, Membership is a linear interpolation`
+* `FuzzyNumber(Membership :: Array{Interval{T}, 1} where T <: Real                      => Give Membership`
+# `FuzzyNumber(lowerbound :: Real, Core :: Real, upperbound :: Real; steps :: Integer)  => Give Range as Reals`
+# `FuzzyNumber(lowerbound :: Real, Core :: Real, upperbound :: Real; steps :: Integer)  => Give Range as bounds`
+"""
 struct FuzzyNumber <: AbstractPoss
 
-    Core :: Interval{T} where T <: Real
-    Range :: Interval{T} where T <: Real
     Membership :: Array{Interval{T}, 1} where T <: Real
 
     function FuzzyNumber(Core = interval(0.5), Range = interval(0, 1), Membership = missing; steps = 200)
 
-        if !(Core ⊆ Range); throw(ArgumentError("Core must be a subset of the Range.\nProvided Core = $Core\nProvided Range = $Range")); end
+        if ismissing(Membership); Membership = linearInterp(Core, Range, steps+1)[1:steps]; end
 
-        if ismissing(Membership); Membership = linearInterp(Core, Range, steps); end
-
-        if Range != Membership[1]; throw(ArgumentError("Range must be the first element of the Membership function.\nProvided Range = $Range\nProvided Membership[1] = $(Membership[1]))"));end
-        if Core != Membership[end]; throw(ArgumentError("Core must be the last element of the Membership function.\nProvided Core = $Core\nProvided Membership[end] = $(Membership[end]))"));end
-
-        return new(Core, Range, Membership)
+        return new(Membership)
     end
 end
 
@@ -64,42 +70,31 @@ isnested(a :: Array{Interval{T}, 1}) where T <: Real = all(a[2:end] .⊆ a[1:end
 #isnested(a :: Array{Interval{T}, 1}) where T <: Real = true
 iscons( a :: Array{Interval{T}, 1}) where T <: Real = isnested(a)
 
-function mass( x :: FuzzyNumber, lo :: Real , hi :: Real)
 
-    if hi < lo; throw(ArgumentError("Incompatable bounds. Provided: [$lo, $hi]")); end
+function mass( x :: FuzzyNumber, y :: Interval{T}) where T <: Real
+    Mems = x.Membership;
 
-    if x.Membership[1] ⊂ interval(lo, hi); return interval(1,1); end
-    if x.Membership[1].lo > hi; return interval(0,0); end
-    if x.Membership[1].hi < lo; return interval(0,0); end
+    masses = 1/interval(length(Mems))
 
-    lefts = left.(x.Membership);
-    rights = right.(x.Membership);
+    subs = sum(y .⊂ Mems)
+    intersects = sum( y .∩ Mems .!= ∅)
 
-    j = range(0, 1, length = length(x.Membership)+1)
+    prob = interval(masses * intersects, masses * subs)
 
-    j = j[2:end];
+    prob = max(prob, 0)
+    prob = min(prob, 1)
 
-    vals = [lefts; reverse(rights)];
-    jj = [j;reverse(j)]
-
-    inside = lo .<= vals .<= hi
-
-    Poss = maximum( jj[inside])
-    Ness = 1 - maximum(jj[ .~inside])
-
-    return interval(Ness, Poss)
+    return prob
 
 end
+
+mass( x :: FuzzyNumber, lo :: Real , hi :: Real) = mass(x, interval(lo, hi))
 
 function membership(F :: FuzzyNumber, x ::Union{Float64, Int64})
     mems = F.Membership
     here = findlast(x .∈ mems)
     if isnothing(here) return 0;end
     return here/(length(mems)+1)
-end
-
-function mass( x :: FuzzyNumber, y :: Interval{T}) where T <: Real
-    return mass( x, y.lo, y.hi)
 end
 
 function mean( x :: FuzzyNumber)
@@ -266,9 +261,9 @@ isfuzzy(x) = typeof(x) <: FuzzyNumber
 
 function Base.show(io::IO, z::FuzzyNumber)
 
-    Range = z.Range
-    Core = z.Core
-    if isscalar(z.Core); Core = z.Core.lo; end
+    Range = z.Membership[1]
+    Core = z.Membership[end]
+    if isscalar(Core); Core = Core.lo; end
 
     print(io, "Fuzzy: \t ~ ( Range=$Range, Core=$Core )");
 

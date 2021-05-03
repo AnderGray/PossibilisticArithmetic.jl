@@ -2,12 +2,27 @@
     A = FuzzyNumber(1,2,3);
     B = FuzzyNumber(2,3,4);
 
-    @test A.Membership[1] == interval(1,3)
-    @test A.Membership[end] == interval(2)
+    @test interval(1,3) ⊆ A.Membership[1]
+    @test interval(2) ⊆ A.Membership[end]
 
     C = levelwise(A,B)
 
-    @test C.Membership[1] == interval(3,7)
-    @test C.Membership[end] == interval(5)
+    @test  interval(3,7) ⊆ C.Membership[1]
+    @test interval(5) ⊆ C.Membership[end]
+
+end
+
+@testset "Mass tests" begin
+    A = FuzzyNumber(1,2,3);
+
+    @test mass(A,interval(1,3)) == interval(0,1)
+    @test mass(A,interval(2)).hi == 1
+    @test mass(A,interval(-10, -5)).hi == interval(0)
+
+    A = FuzzyNumber(1,2,3, steps = 10);
+
+    @test mass(A,interval(1,3)) == interval(0,1)
+    @test mass(A,interval(2)).hi == 1
+    @test mass(A,interval(-10, -5)).hi == interval(0)
 
 end

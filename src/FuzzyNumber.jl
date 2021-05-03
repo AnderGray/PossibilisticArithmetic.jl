@@ -9,22 +9,28 @@
 #                                           Email:  ander.gray@liverpool.ac.uk
 ###
 
+"""
+    struct FuzzyNumber <: AbstractPoss
+
+Basic type in FuzzyArithmetic. Defines a set of nested intervals (Membership), starting from Range (Membership[1]) to the core (Membership[end])
+
+Used to bound a set of probability distribution functions
+
+# Constructors
+* `FuzzyNumber(Core :: Interval, Range :: Interval; steps :: Integer)                   => Give Core and Range, Membership is a linear interpolation`
+* `FuzzyNumber(Membership :: Array{Interval{T}, 1} where T <: Real                      => Give Membership`
+# `FuzzyNumber(lowerbound :: Real, Core :: Real, upperbound :: Real; steps :: Integer)  => Give Range as Reals`
+# `FuzzyNumber(lowerbound :: Real, Core :: Real, upperbound :: Real; steps :: Integer)  => Give Range as bounds`
+"""
 struct FuzzyNumber <: AbstractPoss
 
-    Core :: Interval{T} where T <: Real
-    Range :: Interval{T} where T <: Real
     Membership :: Array{Interval{T}, 1} where T <: Real
 
     function FuzzyNumber(Core = interval(0.5), Range = interval(0, 1), Membership = missing; steps = 200)
 
-        if !(Core ⊆ Range); throw(ArgumentError("Core must be a subset of the Range.\nProvided Core = $Core\nProvided Range = $Range")); end
+        if ismissing(Membership); Membership = linearInterp(Core, Range, steps+1)[1:steps]; end
 
-        if ismissing(Membership); Membership = linearInterp(Core, Range, steps); end
-
-        if Range != Membership[1]; throw(ArgumentError("Range must be the first element of the Membership function.\nProvided Range = $Range\nProvided Membership[1] = $(Membership[1]))"));end
-        if Core != Membership[end]; throw(ArgumentError("Core must be the last element of the Membership function.\nProvided Core = $Core\nProvided Membership[end] = $(Membership[end]))"));end
-
-        return new(Core, Range, Membership)
+        return new(Membership)
     end
 end
 
@@ -70,7 +76,7 @@ function mass( x :: FuzzyNumber, y :: Interval{T}) where T <: Real
 
     masses = 1/interval(length(Mems))
 
-    subs = sum(y .⊆ Mems)
+    subs = sum(y .⊂ Mems)
     intersects = sum( y .∩ Mems .!= ∅)
 
     prob = interval(masses * intersects, masses * subs)
@@ -255,9 +261,9 @@ isfuzzy(x) = typeof(x) <: FuzzyNumber
 
 function Base.show(io::IO, z::FuzzyNumber)
 
-    Range = z.Range
-    Core = z.Core
-    if isscalar(z.Core); Core = z.Core.lo; end
+    Range = z.Membership[1]
+    Core = z.Membership[end]
+    if isscalar(Core); Core = Core.lo; end
 
     print(io, "Fuzzy: \t ~ ( Range=$Range, Core=$Core )");
 

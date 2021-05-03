@@ -1,4 +1,5 @@
 # FuzzyArithmetic.jl
+![Build Status](https://github.com/Institute-for-Risk-and-Uncertainty/FuzzyArithmetic.jl/workflows/CI/badge.svg)
 
 A julia package for performing fuzzy arithmetic.
 

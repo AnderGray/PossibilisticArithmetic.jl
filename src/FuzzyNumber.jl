@@ -160,7 +160,7 @@ end
 ##
 #   Imprecise probability to possibility transform
 ##
-function DSS2Fuzzy(FE :: Array{Interval{T},1}, masses; steps = 200) where T <: Real
+function DSS2Fuzzy(FE :: Array{Interval{T},1}, masses :: Array{Float64,1} = ones(Integer(length(FE)))./length(FE); steps = length(FE)) where T <: Real
 
     if length(FE) < steps; steps = length(FE); end
 

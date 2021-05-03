@@ -13,6 +13,13 @@
 # For now we will use abstract type. When library is finished will use concrete
 function levelwise(x :: AbstractPoss, y :: AbstractPoss; op = +)
 
+    numX = length(x.Membership); numY = length(y.Membership);
+
+    if numX != numY
+        num = max(numX, numY)
+        x = descritize(x,num); y = descritize(y,num)
+    end
+
     memX = x.Membership; memY = y.Membership;
 
     lenX = length(memX); lenY = length(memY);
@@ -32,6 +39,14 @@ function levelwise(x :: AbstractPoss, y :: AbstractPoss; op = +)
 end
 
 function levelwiseOpp(x :: FuzzyNumber, y :: FuzzyNumber; op = +)
+
+    numX = length(x.Membership); numY = length(y.Membership);
+
+    if numX != numY
+        num = max(numX, numY)
+        x = descritize(x,num); y = descritize(y,num)
+    end
+
     xMems = x.Membership; yMems = y.Membership;
 
     yMems = reverse(yMems)
@@ -105,7 +120,6 @@ function tauFuzzy(x :: FuzzyNumber, y :: FuzzyNumber; op = +, C = Pi())
         num = max(numX, numY)
         x = descritize(x,num); y = descritize(y,num)
     end
-
 
     xMems = x.Membership; yMems = y.Membership;
     numX = length(xMems); numY = length(yMems);

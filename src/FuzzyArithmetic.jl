@@ -13,7 +13,7 @@ abstract type AbstractPoss <: Real end
 export
     # FuzzyNumber
     FuzzyNumber, Fuzzy, mass, membership, isnested, iscons, mean, cut, descritize, makeCons, env,
-    makepbox, makefuzzy, ecdf2fuzzy, isfuzzy,
+    makepbox, makefuzzy, ecdf2fuzzy, isfuzzy, DSS2Fuzzy,
 
     # arithemtic
     levelwise, levelwiseOpp, supT, mobiusTransform2D, sigmaFuzzy, tauFuzzy,

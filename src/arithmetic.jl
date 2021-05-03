@@ -43,10 +43,6 @@ function levelwiseOpp(x :: FuzzyNumber, y :: FuzzyNumber; op = +)
 end
 
 
-##
-#   https://github.com/JuliaStats/StatsBase.jl/blob/6f9952d5c9a92faa851822b2e06051f7fc59c294/src/hist.jl#L226-L230
-##
-
 for op in (:+, :-, :*, :/, :min, :max, :^, :log, :<, :>)
     @eval ($op)( x::AbstractPoss, y::AbstractPoss) = levelwise(x, y, op = $op)
     @eval ($op)( x::AbstractPoss, n::Real) = FuzzyNumber(broadcast($op, x.Membership, n))
@@ -136,6 +132,19 @@ function sigmaFuzzy(x :: Fuzzy, y::Fuzzy; op = +, C = Pi())
 
     zs = [op(ints[1],ints[2]) for ints in cartProd]     # Evaluate carteesian product with interval arithm
 
+    return DSS2Fuzzy(zs, masses, steps =  max(length(x.Membership), length(y.Membership)))
+end
+
+function sigmaFuzzyOld(x :: Fuzzy, y::Fuzzy; op = +, C = Pi())
+
+    if C == W; return levelwiseOpp(x, y, op=op);end
+    if C == M; return levelwise(x, y, op= op);end
+
+    zNum = max(length(x.Membership), length(y.Membership))
+    masses, cartProd = mobiusTransform2D(x, y, C)       # Get carteesian prod and masses from Möbius
+
+    zs = [op(ints[1],ints[2]) for ints in cartProd]     # Evaluate carteesian product with interval arithm
+
     zUniq = unique(zs)                                  # Remove repeated intervals for efficiency
 
     #=
@@ -165,7 +174,6 @@ function sigmaFuzzy(x :: Fuzzy, y::Fuzzy; op = +, C = Pi())
     if !isnested(zMems); zMems= makeCons(zMems);end
     return Fuzzy(zMems)
 end
-
 
 
 function sigmaFuzzy1(x :: Fuzzy, y::Fuzzy; op = +, C = Pi())
@@ -228,6 +236,14 @@ end
 
 
 function tauFuzzy(x :: FuzzyNumber, y :: FuzzyNumber; op = +, C = Pi())
+
+    numX = length(x.Membership); numY = length(y.Membership);
+
+    if numX != numY
+        num = max(numX, numY)
+        x = descritize(x,num); y = descritize(y,num)
+    end
+
 
     xMems = x.Membership; yMems = y.Membership;
     numX = length(xMems); numY = length(yMems);

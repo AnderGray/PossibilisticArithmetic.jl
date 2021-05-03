@@ -141,7 +141,7 @@ function descritize(x :: FuzzyNumber, steps = 200)
 end
 
 
-function makeCons(x :: Array{Interval{T},1}) where T <: Real
+function makeConsOld(x :: Array{Interval{T},1}) where T <: Real
 
     x = sort(x,lt = ⊂); x = reverse(x)
     z = Interval{Float64}[]
@@ -156,18 +156,30 @@ function makeCons(x :: Array{Interval{T},1}) where T <: Real
     return z
 end
 
-function makeConsDom(mem :: Array{Interval{T},1}, masses ) where T <: Real
 
-    lefts = left.(mem);
-    rights = right.(mem);
+##
+#   Imprecise probability to possibility transform
+##
+function DSS2Fuzzy(FE :: Array{Interval{T},1}, masses; steps = 200) where T <: Real
 
-    subPos = interval(lefts, rights)
+    if length(FE) < steps; steps = length(FE); end
 
-    NewMembership = [sum(masses[ mem .⊇ this ]) for this in subPos]  # Find beliefs
+    lefts = FuzzyArithmetic.left.(FE);
+    rights = FuzzyArithmetic.right.(FE);
 
+    lefts = sort(lefts); rights = sort(rights, rev=true)
 
+    subPos = interval.(lefts, rights)
 
+    subPos = unique(subPos)
 
+    NewMembership = [sum(masses[ FE .⊇ this ]) for this in subPos]  # Find beliefs
+
+    memberships = range(0,1,length = steps+1)[1:end-1]
+
+    these = [findall( α .<= NewMembership) for α in memberships]
+
+    return Fuzzy([hull(subPos[this]) for this in these])
 end
 
 function makeCons1(x :: Array{Interval{T},1}) where T <: Real

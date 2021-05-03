@@ -12,7 +12,7 @@ abstract type AbstractPoss <: Real end
 
 export
     # FuzzyNumber
-    FuzzyNumber, Fuzzy, mass, isnested, iscons, mean, cut, descritize, makeCons, env,
+    FuzzyNumber, Fuzzy, mass, membership, isnested, iscons, mean, cut, descritize, makeCons, env,
     makepbox, makefuzzy, ecdf2fuzzy, isfuzzy,
 
     # arithemtic

@@ -52,9 +52,7 @@ function levelwiseOpp(x :: FuzzyNumber, y :: FuzzyNumber; op = +)
     yMems = reverse(yMems)
     zMems = op.(xMems, yMems)
 
-    #zMems = sort(zMems, lt = ⊂, rev = true)
-    zMems = makeCons(zMems)
-    return Fuzzy(zMems)
+    return DSS2Fuzzy(zMems)
 end
 
 

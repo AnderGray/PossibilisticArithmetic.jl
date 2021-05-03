@@ -10,9 +10,7 @@ import ProbabilityBoundsAnalysis: pbox, plot, left, right, mean, var, env
 abstract type AbstractPoss <: Real end
 
 
-export
-    # FuzzyNumber
-    FuzzyNumber, Fuzzy, mass, membership, isnested, iscons, mean, cut, descritize, makeCons, env,
+export FuzzyNumber, Fuzzy, mass, membership, isnested, iscons, mean, cut, descritize, makeCons, env,
     makepbox, makefuzzy, ecdf2fuzzy, isfuzzy, DSS2Fuzzy,
 
     # arithemtic
@@ -23,9 +21,9 @@ export
 
 include("FuzzyNumber.jl")
 include("arithmetic.jl")
-#include("Tnorms.jl")
-#include("PossibilityNumbers.jl")
-#include("PossArithmetic.jl")
+# include("Tnorms.jl")
+# include("PossibilityNumbers.jl")
+# include("PossArithmetic.jl")
 include("plots.jl")
 include("inference.jl")
 

@@ -11,15 +11,15 @@
 
 
 # Note, not riggerous
-function invertUniv(f :: Function, outFuzzys :: FuzzyNumber, InputRange, Nsamples = 10^4, Ndes = 200)
+function invertUniv(f::Function, outFuzzys::FuzzyNumber, InputRange, Nsamples = 10^4, Ndes = 200)
 
-    samps = rand(Nsamples) .* (InputRange.hi - InputRange.lo ) .+InputRange.lo;
+    samps = rand(Nsamples) .* (InputRange.hi - InputRange.lo ) .+ InputRange.lo;
     outSamps = f.(samps)
     sampsMems = membership.(outFuzzys, outSamps)
 
-    inMems = range(0,stop=1, length = Ndes)
+    inMems = range(0, stop = 1, length = Ndes)
 
-    inLow = minimum(samps[sampsMems .!=0]); inHi = maximum(samps[sampsMems .!=0])
+    inLow = minimum(samps[sampsMems .!= 0]); inHi = maximum(samps[sampsMems .!= 0])
     inRange = interval(inLow, inHi)
 
     inIntervals = Interval{Float64}[]
@@ -27,9 +27,9 @@ function invertUniv(f :: Function, outFuzzys :: FuzzyNumber, InputRange, Nsample
 
     for i = 2:Ndes
 
-        these = findall(inMems[i-1] .<= sampsMems .<= inMems[i])
+        these = findall(inMems[i - 1] .<= sampsMems .<= inMems[i])
 
-        if isempty(these); 
+        if isempty(these);
             push!(inIntervals, inIntervals[end]);
         else
             inLow = minimum(samps[these]); inHi = maximum(samps[these])
@@ -41,18 +41,18 @@ function invertUniv(f :: Function, outFuzzys :: FuzzyNumber, InputRange, Nsample
     return Fuzzy(inIntervals)
 end
 
-function invertUniv2(f :: Function, outFuzzys :: FuzzyNumber, InputRange, Nsamples = 10^4, Ndes = 200)
+function invertUniv2(f::Function, outFuzzys::FuzzyNumber, InputRange, Nsamples = 10^4, Ndes = 200)
 
-    samps = rand(Nsamples) .* (InputRange.hi - InputRange.lo ) .+InputRange.lo;
+    samps = rand(Nsamples) .* (InputRange.hi - InputRange.lo ) .+ InputRange.lo;
     outSamps = f.(samps)
     sampsMems = membership.(outFuzzys, outSamps)
 
     maxMem = findmax(sampsMems)
     core = interval(minimum(samps[maxMem[2]]), maximum(samps[maxMem[2]]))
 
-    inMems = range(0,stop=1, length = Ndes)
+    inMems = range(0, stop = 1, length = Ndes)
 
-    inLow = minimum(samps[sampsMems .!=0]); inHi = maximum(samps[sampsMems .!=0])
+    inLow = minimum(samps[sampsMems .!= 0]); inHi = maximum(samps[sampsMems .!= 0])
     inRange = interval(inLow, inHi)
 
     inIntervals = Interval{Float64}[]
@@ -72,22 +72,22 @@ function invertUniv2(f :: Function, outFuzzys :: FuzzyNumber, InputRange, Nsampl
             if isempty(leftSamps); leftSamps = inIntervals[end].lo;end
             if isempty(rightSamps); rightSamps = inIntervals[end].hi;end
 
-            push!(inIntervals, interval(maximum(leftSamps),minimum(rightSamps)))
+            push!(inIntervals, interval(maximum(leftSamps), minimum(rightSamps)))
         end
-        
+
     end
 
     return Fuzzy(inIntervals)
 end
 
-function invertUnivScatter(f :: Function, outFuzzys :: FuzzyNumber, InputRange, Nsamples = 10^4, Ndes = 200)
+function invertUnivScatter(f::Function, outFuzzys::FuzzyNumber, InputRange, Nsamples = 10^4, Ndes = 200)
 
-    samps = rand(Nsamples) .* (InputRange.hi - InputRange.lo ) .+InputRange.lo;
+    samps = rand(Nsamples) .* (InputRange.hi - InputRange.lo ) .+ InputRange.lo;
     outSamps = f.(samps)
     sampsMems = membership.(outFuzzys, outSamps)
 
     return samps, sampsMems
-    
+
 end
 
 
@@ -98,7 +98,7 @@ function invertSampling(f, outData, InputRange, Nsamples = 10^4)
 
     Ndims = length(InputRange)
 
-    samps = rand(Nsamples, Ndims) .* (right.(InputRange) - left.(InputRange))' .+left.(InputRange)';
+    samps = rand(Nsamples, Ndims) .* (right.(InputRange) - left.(InputRange))' .+ left.(InputRange)';
 
     outFuzzys = [ecdf2fuzzy(outData[i,:]) for i = 1:size(outData)[1]]
     outSamps = f(samps')
@@ -122,9 +122,9 @@ function poss2Fuzzy1(xs, poss, Ndes = 200)
     maxMem = findmax(poss)
     core = interval(minimum(xs[maxMem[2]]), maximum(xs[maxMem[2]]))
 
-    inMems = range(0,stop=1, length = Ndes)
+    inMems = range(0, stop = 1, length = Ndes)
 
-    inLow = minimum(xs[poss .!=0]); inHi = maximum(xs[poss .!=0])
+    inLow = minimum(xs[poss .!= 0]); inHi = maximum(xs[poss .!= 0])
     inRange = interval(inLow, inHi)
 
     inIntervals = Interval{Float64}[]
@@ -144,9 +144,9 @@ function poss2Fuzzy1(xs, poss, Ndes = 200)
             if isempty(leftSamps); leftSamps = inIntervals[end].lo;end
             if isempty(rightSamps); rightSamps = inIntervals[end].hi;end
 
-            push!(inIntervals, interval(maximum(leftSamps),minimum(rightSamps)))
+            push!(inIntervals, interval(maximum(leftSamps), minimum(rightSamps)))
         end
-        
+
     end
 
     return Fuzzy(inIntervals)
@@ -158,19 +158,19 @@ function poss2Fuzzy(xs, poss, Ndes = 200)
     maxMem = findmax(poss)
     core = interval(minimum(xs[maxMem[2]]), maximum(xs[maxMem[2]]))
 
-    inMems = range(0,stop=1, length = Ndes)
+    inMems = range(0, stop = 1, length = Ndes)
 
-    inLow = minimum(xs[poss .!=0]); inHi = maximum(xs[poss .!=0])
+    inLow = minimum(xs[poss .!= 0]); inHi = maximum(xs[poss .!= 0])
     inRange = interval(inLow, inHi)
 
     inIntervals = Interval{Float64}[]
     push!(inIntervals, inRange)
-    
+
     for i = 2:Ndes
-    
-        these = findall(inMems[i-1] .<= poss .<= inMems[i])
-    
-        if isempty(these); 
+
+        these = findall(inMems[i - 1] .<= poss .<= inMems[i])
+
+        if isempty(these);
             push!(inIntervals, inIntervals[end]);
         else
             inLow = minimum(xs[these]); inHi = maximum(xs[these])
@@ -187,11 +187,11 @@ end
 ##
 function indepJoint(A)
 
-    Nsamps,Ndim = size(A)
+    Nsamps, Ndim = size(A)
 
     joint = zeros(Nsamps)
 
-    for i =1:Nsamps
+    for i = 1:Nsamps
         joint[i] = 1 - (1 - minimum(A[i,:]))^Ndim
     end
 
@@ -200,9 +200,9 @@ end
 
 
 function f(A)
-    x = A[:,1]; y =A[:,2];
-    z = x.+y
-    h = x.*y
+    x = A[:,1]; y = A[:,2];
+    z = x .+ y
+    h = x .* y
 
     return [z h]
 end

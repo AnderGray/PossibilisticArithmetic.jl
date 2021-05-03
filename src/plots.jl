@@ -10,19 +10,19 @@
 ###
 
 
-function plot(x :: FuzzyNumber, fill = true; name = missing, col = missing, alpha = 0.2, fontsize = 18)
+function plot(x::FuzzyNumber, fill = true; name = missing, col = missing, alpha = 0.2, fontsize = 18)
 
     edgeCol = "red"; fillcol = "grey"
     if !(ismissing(col)); edgeCol = fillcol = col;end
 
-    if ismissing(name); fig = figure(figsize=(10,10))else; fig = figure(name,figsize=(10,10));end
+    if ismissing(name); fig = figure(figsize = (10, 10))else; fig = figure(name, figsize = (10, 10));end
     ax = fig.add_subplot()
 
     mems = x.Membership; n = length(mems);
 
     Core = x.Membership[end];
 
-    j = range(0, 1, length = n+1);
+    j = range(0, 1, length = n + 1);
 
     lefts = left.(mems)
     PyPlot.step([lefts; lefts[end]], j, color = edgeCol, where = "pre");
@@ -30,22 +30,22 @@ function plot(x :: FuzzyNumber, fill = true; name = missing, col = missing, alph
     rights = right.(mems)
     PyPlot.step([rights[1]; rights], j, color = edgeCol, where = "post");
 
-    PyPlot.plot([Core.lo, Core.hi] , [1, 1], color = edgeCol);
+    PyPlot.plot([Core.lo, Core.hi], [1, 1], color = edgeCol);
 
     if fill
-        ax.fill_between([lefts; reverse(rights)], zeros(2 * n), [j[2:end]; reverse(j[2:end])], alpha=alpha, color =fillcol)
+        ax.fill_between([lefts; reverse(rights)], zeros(2 * n), [j[2:end]; reverse(j[2:end])], alpha = alpha, color = fillcol)
     end
 
     xticks(fontsize = fontsize); yticks(fontsize = fontsize)
-    xlabel("Range",fontsize = fontsize); ylabel("α",fontsize=fontsize);
+    xlabel("Range", fontsize = fontsize); ylabel("α", fontsize = fontsize);
 end
 
-function plotOld(x :: FuzzyNumber, fill = true; name = missing, col = missing, alpha = 0.2, fontsize = 18)
+function plotOld(x::FuzzyNumber, fill = true; name = missing, col = missing, alpha = 0.2, fontsize = 18)
 
     edgeCol = "red"; fillcol = "grey"
     if !(ismissing(col)); edgeCol = fillcol = col;end
 
-    if ismissing(name); fig = figure(figsize=(10,10))else; fig = figure(name,figsize=(10,10));end
+    if ismissing(name); fig = figure(figsize = (10, 10))else; fig = figure(name, figsize = (10, 10));end
     ax = fig.add_subplot()
 
     mems = x.Membership; n = length(mems);
@@ -60,17 +60,17 @@ function plotOld(x :: FuzzyNumber, fill = true; name = missing, col = missing, a
     rights = right.(mems)
     PyPlot.step(rights, j, color = edgeCol, where = "pre");
 
-    PyPlot.plot([Core.lo, Core.hi] , [1, 1], color = edgeCol);
+    PyPlot.plot([Core.lo, Core.hi], [1, 1], color = edgeCol);
 
     if fill
-        ax.fill_between([lefts; reverse(rights)], zeros(2 * n), [j; reverse(j)], alpha=alpha, color =fillcol)
+        ax.fill_between([lefts; reverse(rights)], zeros(2 * n), [j; reverse(j)], alpha = alpha, color = fillcol)
     end
 
     xticks(fontsize = fontsize); yticks(fontsize = fontsize)
-    xlabel("Range",fontsize = fontsize); ylabel("α",fontsize=fontsize);
+    xlabel("Range", fontsize = fontsize); ylabel("α", fontsize = fontsize);
 
 end
-#=
+#= 
 
 function plot(x :: PossNumber, fill = true; name = missing, col = missing, alpha = 0.2, fontsize = 18)
 
@@ -159,10 +159,9 @@ function plot(x :: PossNumber, fill = true; name = missing, col = missing, alpha
     xticks(fontsize = fontsize); yticks(fontsize = fontsize)
     xlabel("Range",fontsize = fontsize); ylabel("α",fontsize=fontsize);
 
-end
-=#
+end =#
 
-#=
+#= 
 function plot(x :: tnorm; name =missing, pn = 50, fontsize=18, alpha = 0.8, title = missing)
     A = x.T
     if !ismissing(x.func)
@@ -217,9 +216,8 @@ function plotContourCdf(x; name = "SurfacePlots",fontsize=18)
     xlabel("y",fontsize=fontsize)
     ylabel("x",fontsize=fontsize)
 
-end
-=#
-function plotJoint(x :: Fuzzy, y ::Fuzzy, C ; name = missing, alpha = 0.6, fontsize = 22, title = missing)
+end =#
+function plotJoint(x::Fuzzy, y::Fuzzy, C ; name = missing, alpha = 0.6, fontsize = 22, title = missing)
 
     xNumMem = length(x.Membership); yNumMem = length(y.Membership);
 
@@ -242,33 +240,33 @@ function plotJoint(x :: Fuzzy, y ::Fuzzy, C ; name = missing, alpha = 0.6, fonts
     xPos = [xPos; reverse(xPos)]
     yPos = [yPos; reverse(yPos)]
 
-    zPos = [1-C(x,y)[1] for x in xPos, y in yPos]
+    zPos = [1 - C(x, y)[1] for x in xPos, y in yPos]
 
     zPos = convert(Array{Float64,2}, zPos)
 
     zPos = zPos[1:SUB:end, 1:SUB:end]
 
-    xgrid = repeat(xs',length(xs),1)
-    ygrid = repeat(ys,1,length(ys))
+    xgrid = repeat(xs', length(xs), 1)
+    ygrid = repeat(ys, 1, length(ys))
 
-    if ismissing(name); fig = figure(figsize=(10,10)) else fig = figure(name,figsize=(10,10));end
-    ax = fig.add_subplot(1,1,1,projection="3d")
+    if ismissing(name); fig = figure(figsize = (10, 10)) else fig = figure(name, figsize = (10, 10));end
+    ax = fig.add_subplot(1, 1, 1, projection = "3d")
 
-    plot_surface(xgrid,ygrid, zPos, edgecolors="k", alpha = alpha, cstride=2, linewidth=0.25, cmap=ColorMap("RdGy"))
-    ax.view_init(45-27, 180+ 26)
-    xlabel("y",fontsize=fontsize)
-    ylabel("x",fontsize=fontsize)
+    plot_surface(xgrid, ygrid, zPos, edgecolors = "k", alpha = alpha, cstride = 2, linewidth = 0.25, cmap = ColorMap("RdGy"))
+    ax.view_init(45 - 27, 180 + 26)
+    xlabel("y", fontsize = fontsize)
+    ylabel("x", fontsize = fontsize)
     ax.zaxis.set_rotate_label(false);
-    zlabel("J(x,y)", rotation = 0,fontsize=fontsize)
-    if !ismissing(title); PyPlot.title(title,fontsize= fontsize);end
-    #xticks(fontsize = fontsize); yticks(fontsize = fontsize);
-    #PyPlot.title(title,fontsize=fontsize)
+    zlabel("J(x,y)", rotation = 0, fontsize = fontsize)
+    if !ismissing(title); PyPlot.title(title, fontsize = fontsize);end
+    # xticks(fontsize = fontsize); yticks(fontsize = fontsize);
+    # PyPlot.title(title,fontsize=fontsize)
     tight_layout()
 
 end
 
 
-function plotJointSubsets(x :: Fuzzy, y ::Fuzzy, C ; name = missing, alpha = 0.6, fontsize = 22, title = missing)
+function plotJointSubsets(x::Fuzzy, y::Fuzzy, C ; name = missing, alpha = 0.6, fontsize = 22, title = missing)
 
     xNumMem = length(x.Membership); yNumMem = length(y.Membership);
 
@@ -291,24 +289,24 @@ function plotJointSubsets(x :: Fuzzy, y ::Fuzzy, C ; name = missing, alpha = 0.6
     xPos = [xPos; reverse(xPos)]
     yPos = [yPos; reverse(yPos)]
 
-    zPos = [C(x,y)[1] for x in xPos, y in yPos]
+    zPos = [C(x, y)[1] for x in xPos, y in yPos]
 
     zPos = convert(Array{Float64,2}, zPos)
 
     zPos = zPos[1:SUB:end, 1:SUB:end]
 
-    xgrid = repeat(xs',length(xs),1)
-    ygrid = repeat(ys,1,length(ys))
+    xgrid = repeat(xs', length(xs), 1)
+    ygrid = repeat(ys, 1, length(ys))
 
-    if ismissing(name); fig = figure(figsize=(10,10)) else fig = figure(name,figsize=(10,10));end
-    ax = fig.add_subplot(1,1,1,projection="3d")
+    if ismissing(name); fig = figure(figsize = (10, 10)) else fig = figure(name, figsize = (10, 10));end
+    ax = fig.add_subplot(1, 1, 1, projection = "3d")
 
-    plot_surface(xgrid,ygrid, zPos, edgecolors="k", alpha = 0, cstride=2, linewidth=1, cmap=ColorMap("RdGy"))
+    plot_surface(xgrid, ygrid, zPos, edgecolors = "k", alpha = 0, cstride = 2, linewidth = 1, cmap = ColorMap("RdGy"))
 
     NumInts = 7
 
     xMems = x.Membership; yMems = y.Membership;
-    subx = Int(floor(xNumMem/NumInts)); suby = Int(floor(yNumMem/NumInts));
+    subx = Int(floor(xNumMem / NumInts)); suby = Int(floor(yNumMem / NumInts));
 
     xMems = xMems[1:subx:end]; yMems = yMems[1:suby:end];
 
@@ -316,43 +314,43 @@ function plotJointSubsets(x :: Fuzzy, y ::Fuzzy, C ; name = missing, alpha = 0.6
         xlo = xMems[i].lo; xhi = xMems[i].hi;
         ylo = yMems[i].lo; yhi = yMems[i].hi;
 
-        xs = range(xlo,xhi,length= 20);
-        ys = range(ylo,yhi,length= 20);
-        xgrid = repeat(xs',length(xs),1)
-        ygrid = repeat(ys,1,length(ys))
-        z = ones(length(xs),length(ys)) .* (subx*(i-1))/xNumMem
-        plot_surface(xgrid,ygrid, z, edgecolors="k", alpha = alpha, cstride=4, linewidth=2)#,color = "grey")
+        xs = range(xlo, xhi, length = 20);
+        ys = range(ylo, yhi, length = 20);
+        xgrid = repeat(xs', length(xs), 1)
+        ygrid = repeat(ys, 1, length(ys))
+        z = ones(length(xs), length(ys)) .* (subx * (i - 1)) / xNumMem
+        plot_surface(xgrid, ygrid, z, edgecolors = "k", alpha = alpha, cstride = 4, linewidth = 2)# ,color = "grey")
 
     end
 
-    ax.view_init(45-27, 180+ 26)
-    xlabel("y",fontsize=fontsize)
-    ylabel("x",fontsize=fontsize)
+    ax.view_init(45 - 27, 180 + 26)
+    xlabel("y", fontsize = fontsize)
+    ylabel("x", fontsize = fontsize)
     ax.zaxis.set_rotate_label(false);
-    zlabel("J(x,y)", rotation = 0,fontsize=fontsize)
-    if !ismissing(title); PyPlot.title(title,fontsize= fontsize);end
-    #xticks(fontsize = fontsize); yticks(fontsize = fontsize);
-    #PyPlot.title(title,fontsize=fontsize)
+    zlabel("J(x,y)", rotation = 0, fontsize = fontsize)
+    if !ismissing(title); PyPlot.title(title, fontsize = fontsize);end
+    # xticks(fontsize = fontsize); yticks(fontsize = fontsize);
+    # PyPlot.title(title,fontsize=fontsize)
     tight_layout()
 
 end
 
 
-function plotTgen(name =missing)
+function plotTgen(name = missing)
 
-    x = range(0,1,length = 200)
+    x = range(0, 1, length = 200)
 
-    Ts = [Tgen(xs,ys) for xs in x, ys in x]
+    Ts = [Tgen(xs, ys) for xs in x, ys in x]
 
-    plot(tnorm(Ts),name = name)
+    plot(tnorm(Ts), name = name)
 
 end
 
 function plotTInd(name = missing)
 
-    x = range(0,1,length = 200)
+    x = range(0, 1, length = 200)
 
-    Ts = [Tind(xs,ys) for xs in x, ys in x]
+    Ts = [Tind(xs, ys) for xs in x, ys in x]
 
     plot(tnorm(Ts), name = name)
 
@@ -360,9 +358,9 @@ end
 
 function plotTest(name = missing)
 
-    x = range(0,1,length = 200)
+    x = range(0, 1, length = 200)
 
-    Ts = TestNorm(x,x)
+    Ts = TestNorm(x, x)
 
     plot(tnorm(Ts), name = name)
 

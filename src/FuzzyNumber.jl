@@ -64,42 +64,31 @@ isnested(a :: Array{Interval{T}, 1}) where T <: Real = all(a[2:end] .⊆ a[1:end
 #isnested(a :: Array{Interval{T}, 1}) where T <: Real = true
 iscons( a :: Array{Interval{T}, 1}) where T <: Real = isnested(a)
 
-function mass( x :: FuzzyNumber, lo :: Real , hi :: Real)
 
-    if hi < lo; throw(ArgumentError("Incompatable bounds. Provided: [$lo, $hi]")); end
+function mass( x :: FuzzyNumber, y :: Interval{T}) where T <: Real
+    Mems = x.Membership;
 
-    if x.Membership[1] ⊂ interval(lo, hi); return interval(1,1); end
-    if x.Membership[1].lo > hi; return interval(0,0); end
-    if x.Membership[1].hi < lo; return interval(0,0); end
+    masses = 1/interval(length(Mems))
 
-    lefts = left.(x.Membership);
-    rights = right.(x.Membership);
+    subs = sum(y .⊆ Mems)
+    intersects = sum( y .∩ Mems .!= ∅)
 
-    j = range(0, 1, length = length(x.Membership)+1)
+    prob = interval(masses * intersects, masses * subs)
 
-    j = j[2:end];
+    prob = max(prob, 0)
+    prob = min(prob, 1)
 
-    vals = [lefts; reverse(rights)];
-    jj = [j;reverse(j)]
-
-    inside = lo .<= vals .<= hi
-
-    Poss = maximum( jj[inside])
-    Ness = 1 - maximum(jj[ .~inside])
-
-    return interval(Ness, Poss)
+    return prob
 
 end
+
+mass( x :: FuzzyNumber, lo :: Real , hi :: Real) = mass(x, interval(lo, hi))
 
 function membership(F :: FuzzyNumber, x ::Union{Float64, Int64})
     mems = F.Membership
     here = findlast(x .∈ mems)
     if isnothing(here) return 0;end
     return here/(length(mems)+1)
-end
-
-function mass( x :: FuzzyNumber, y :: Interval{T}) where T <: Real
-    return mass( x, y.lo, y.hi)
 end
 
 function mean( x :: FuzzyNumber)

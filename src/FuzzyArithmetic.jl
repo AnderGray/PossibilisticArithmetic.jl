@@ -5,7 +5,7 @@ using ProbabilityBoundsAnalysis, IntervalArithmetic, PyPlot
 using BivariateCopulas: M, W, Pi, Gaussian
 
 import Base: -, +, *, /, //, <, >, ⊆, ^, intersect, issubset, rand, min, max, log, exp, sin, cos, tan, isequal, ∪, ∩
-import ProbabilityBoundsAnalysis: pbox, plot, left, right, mean, var, env
+import ProbabilityBoundsAnalysis: pbox, plot, left, right, mean, var, env, makepbox
 
 abstract type AbstractPoss <: Real end
 

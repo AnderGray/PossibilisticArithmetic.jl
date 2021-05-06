@@ -62,7 +62,7 @@ function FuzzyNumber(Membership::Array{Interval{T},1}) where T <: Real
 
 end
 
-#= 
+#=
 function isnested( a :: Array{Interval{T}, 1}) where T <: Real
     leftSorted = issorted( left.(a))
     rightSorted = issorted( right.(a),  rev=true)
@@ -81,10 +81,10 @@ function mass(x::FuzzyNumber, y::Interval{T}) where T <: Real
 
     masses = 1 / interval(length(Mems))
 
-    subs = sum(y .⊂ Mems)
+    subs = sum(Mems .⊆ y)
     intersects = sum(y .∩ Mems .!= ∅)
 
-    prob = interval(masses * intersects, masses * subs)
+    prob = interval(masses * subs, masses * intersects)
 
     prob = max(prob, 0)
     prob = min(prob, 1)

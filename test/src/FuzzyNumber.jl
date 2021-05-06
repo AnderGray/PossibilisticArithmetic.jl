@@ -48,17 +48,18 @@
 
 end
 
+
 @testset "Mass tests" begin
     A = FuzzyNumber(1, 2, 3);
 
-    @test mass(A, interval(1, 3)) == interval(0, 1)
-    @test mass(A, interval(2)).hi == 1
-    @test mass(A, interval(-10, -5)).hi == interval(0)
+    @test mass(A, interval(1, 3)).hi == 1
+    @test mass(A, interval(2)) == interval(0,1)
+    @test mass(A, interval(-10, -5)) == interval(0)
 
     A = FuzzyNumber(1, 2, 3, steps = 10);
 
-    @test mass(A, interval(1, 3)) == interval(0, 1)
-    @test mass(A, interval(2)).hi == 1
+    @test mass(A, interval(1, 3)).hi == 1
+    @test mass(A, interval(2)) == interval(0,1)
     @test mass(A, interval(-10, -5)).hi == interval(0)
 
 end

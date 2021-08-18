@@ -5,7 +5,7 @@
 
 ### In development. Package can currently:
 
-* Robust outer approximations of membership functions with different step sizes
+* Construct robust outer approximations of membership functions with different step sizes
 * Construct fuzzy numbers with a real or interval core
 * Get interval bounds on probabilities
 * Perform dependent arithmeric (using [copulas](https://github.com/AnderGray/BivariateCopulas.jl)) between fuzzy numbers
@@ -15,7 +15,7 @@
 * Unary operators: `-, sin, cos, tan, exp, log`
 * Interacts with [ProbabilityBoundsAnalysis.jl](https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl) and [IntervalArithmetic.jl](https://github.com/JuliaIntervals/IntervalArithmetic.jl)
 * Conversions between fuzzy numbers, [p-boxes](https://en.wikipedia.org/wiki/Probability_box), and more general [random sets](https://en.wikipedia.org/wiki/Dempster–Shafer_theory)
-* Plot fuzzy numbers
+* Plot fuzzy numbers (requires PyPlot)
 
 ### Soon:
 * Multimodal possibility distributions (non-convext fuzzy sets) using [IntervalUnionArithmetic.jl](https://github.com/AnderGray/IntervalUnionArithmetic.jl)
@@ -25,7 +25,7 @@
 Resources
 ---
 
-* Fuzzy & Possibility Interest Group (FnPIG) [google site](https://sites.google.com/site/fuzzypossrisk/)
+* Fuzzy & Possibility Interest Group (FnPIG) [google site](https://sites.google.com/site/fuzzypossrisk/) (access granted on request)
 * Society for Imprecise Probabilities: Theories and Applications [website](https://www.sipta.org)
 * [ISIPTA21 paper](https://leo.ugr.es/isipta21/pmlr/gray21.pdf)
 * [ISIPTA21 poster](https://www.researchgate.net/publication/353220811_Poster_Dependent_Possibilistic_Arithmetic_using_Copulas)

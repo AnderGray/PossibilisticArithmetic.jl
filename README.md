@@ -42,16 +42,16 @@ Use
 ---
 
 ```julia
-julia> a = FuzzyNumber(0, 1, 2)
+julia> a = Fuzzy(0, 1, 2)
 Fuzzy: 	 ~ ( Range=[0, 2], Core=1.0 )
 
-julia> a = FuzzyNumber(0, 1, 2, steps = 200) # Give number of steps, default = 200
+julia> a = Fuzzy(0, 1, 2, steps = 200) # Give number of steps, default = 200
 Fuzzy: 	 ~ ( Range=[0, 2], Core=1.0 )
 
 julia> cut(a,0.2)
 [0.195979, 1.80403]
 
-julia> b = FuzzyNumber(0, 1, 1.5, 2)
+julia> b = Fuzzy(0, 1, 1.5, 2)
 Fuzzy: 	 ~ ( Range=[0, 2], Core=[1, 1.5] )
 
 julia> c = a * b

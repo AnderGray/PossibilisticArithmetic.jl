@@ -1,4 +1,4 @@
-# FuzzyArithmetic.jl
+# PossibilisticArithmetic.jl
 ![Build Status](https://github.com/Institute-for-Risk-and-Uncertainty/FuzzyArithmetic.jl/workflows/CI/badge.svg)
 
 [Possibility Theory](https://en.wikipedia.org/wiki/Possibility_theory): fuzzy set theory applied to bounding sets of probability measures ([Imprecise Probabilities](https://en.wikipedia.org/wiki/Imprecise_probability)). This package gives a rigorous arithetic between possibility distributions.

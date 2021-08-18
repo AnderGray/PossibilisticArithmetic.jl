@@ -1,7 +1,5 @@
 module FuzzyArithmetic
 
-using Base: subtract_singletontype
-using Core: Matrix
 using ProbabilityBoundsAnalysis, IntervalArithmetic, PyPlot
 
 using BivariateCopulas: M, W, Pi, Gaussian

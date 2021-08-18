@@ -3,7 +3,9 @@
 
 [Possibility Theory](https://en.wikipedia.org/wiki/Possibility_theory): fuzzy set theory applied to bounding sets of probability measures ([Imprecise Probabilities](https://en.wikipedia.org/wiki/Imprecise_probability)). This package gives a rigorous arithetic between possibility distributions.
 
-### In development. Package can currently:
+### In development. All contributions welcome
+
+### Package can currently:
 
 * Construct fuzzy numbers with a real or interval core
 * Have different discretization of the membership function
@@ -13,6 +15,8 @@
 * Interacts with [ProbabilityBoundsAnalysis.jl](https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl)
 * Plot fuzzy numbers
 
+### Soon:
+* Multimodal Possibility Distributions (non-convext fuzzy sets) using [IntervalUnionArithmetic.jl](https://github.com/AnderGray/IntervalUnionArithmetic.jl)
 
 Installation
 ---

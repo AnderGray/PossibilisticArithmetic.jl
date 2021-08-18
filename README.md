@@ -5,7 +5,7 @@
 
 ### In development. Package can currently:
 
-* Robust outer approximations of membership functions with different step sizes
+* Construct robust outer approximations of membership functions with different step sizes
 * Construct fuzzy numbers with a real or interval core
 * Get interval bounds on probabilities
 * Perform dependent arithmeric (using [copulas](https://github.com/AnderGray/BivariateCopulas.jl)) between fuzzy numbers

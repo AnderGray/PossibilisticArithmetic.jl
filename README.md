@@ -34,7 +34,7 @@ Resources
 Installation
 ---
 
-`PossibilisticArithmtic.jl` is a not yet a registered Julia package, and so the latest release can be installed using the Julia package manager:
+`PossibilisticArithmtic.jl` is a not yet a registered Julia package, and but the latest version can be installed using the Julia package manager:
 
 ```julia
 julia> ]
@@ -52,7 +52,7 @@ Fuzzy: 	 ~ ( Range=[0, 2], Core=1.0 )
 julia> a = Fuzzy(0, 1, 2, steps = 200) # Give number of steps, default = 200
 Fuzzy: 	 ~ ( Range=[0, 2], Core=1.0 )
 
-julia> cut(a,0.2)
+julia> cut(a,0.2)       # get an Alpha-cut, returns an interval
 [0.195979, 1.80403]
 
 julia> b = Fuzzy(0, 1, 1.5, 2)

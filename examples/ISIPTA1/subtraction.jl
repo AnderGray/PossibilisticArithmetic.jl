@@ -1,4 +1,4 @@
-using FuzzyArithmetic, Distributions, BivariateCopulas, PyPlot, Test
+using PossibilisticArithmetic, Distributions, BivariateCopulas, PyPlot, Test
 
 a = Fuzzy(1,2,3)
 b = Fuzzy(1,2,4)

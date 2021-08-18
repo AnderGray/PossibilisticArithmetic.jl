@@ -1,4 +1,4 @@
-using FuzzyArithmetic, LaTeXStrings, PyPlot
+using PossibilisticArithmetic, LaTeXStrings, PyPlot
 
 a = Fuzzy(1,2,3)
 b = Fuzzy(1,2,3)

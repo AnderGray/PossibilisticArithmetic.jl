@@ -1,4 +1,4 @@
-using FuzzyArithmetic, BivariateCopulas, ProbabilityBoundsAnalysis, LaTeXStrings
+using PossibilisticArithmetic, BivariateCopulas, ProbabilityBoundsAnalysis, LaTeXStrings
 
 
 a = Fuzzy(1,2,3)

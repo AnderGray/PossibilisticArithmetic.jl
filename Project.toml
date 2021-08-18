@@ -1,4 +1,4 @@
-name = "FuzzyArithmetic"
+name = "PossibilisticArithmetic"
 uuid = "31822d60-0862-422f-9a3d-0eb9781332f3"
 authors = ["Ander Gray <ander.gray@liverpool.ac.uk>"]
 version = "0.1.0"

@@ -1,4 +1,4 @@
-using FuzzyArithmetic, LaTeXStrings, PyPlot, BivariateCopulas
+using PossibilisticArithmetic, LaTeXStrings, PyPlot, BivariateCopulas
 
 
 a = Fuzzy(1,2,3)

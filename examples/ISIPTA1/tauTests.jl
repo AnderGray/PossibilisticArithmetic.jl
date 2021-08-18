@@ -1,4 +1,4 @@
-include("../../src/FuzzyNumbers.jl")
+using PossibilisticArithmetic
 
 a = FuzzyNumber(1,2,3)
 b = FuzzyNumber(1,2,3)

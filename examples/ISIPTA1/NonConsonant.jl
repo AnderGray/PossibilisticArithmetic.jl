@@ -1,4 +1,4 @@
-using FuzzyArithmetic, BivariateCopulas,LaTeXStrings
+using PossibilisticArithmetic, BivariateCopulas,LaTeXStrings
 
 function sigmaFuzzyNC(x::Fuzzy, y::Fuzzy; op = +, C = Pi())
 

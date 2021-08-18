@@ -18,7 +18,7 @@ Used to bound a set of probability distribution functions in the Imprecise Proba
 
 # Constructors
 * `FuzzyNumber(Core :: Interval, Range :: Interval; steps :: Integer)                   => Give Core and Range, Membership is a linear interpolation`
-* `FuzzyNumber(Membership :: Array{Interval{T}, 1} where T <: Real                      => Give Membership`
+* `FuzzyNumber(Membership :: Vector{Interval{T}} where T <: Real                        => Give Membership`
 * `FuzzyNumber(lowerbound :: Real, Core :: Real, upperbound :: Real; steps :: Integer)      => Give Range as Reals`
 * `FuzzyNumber(lowerbound :: Real, Core :: Real, upperbound :: Real; steps :: Integer)      => Give Core and Range as reals`
 
@@ -29,7 +29,7 @@ See also: [`mass`](@ref), [`membership`](@ref), [`Fuzzy`](@ref), [`plot`](@ref),
 """
 struct FuzzyNumber <: AbstractPoss
 
-    Membership::Array{Interval{T},1} where T <: Real
+    Membership::Vector{Interval{T}} where T <: Real
 
     function FuzzyNumber(Core = interval(0.5), Range = interval(0, 1), Membership = missing; steps = 200)
 
@@ -54,7 +54,7 @@ FuzzyNumber(lowerbound::Real, Core::Real, upperbound::Real; steps = 200) = Fuzzy
 FuzzyNumber(lowerbound::Real, CoreLeft::Real, CoreRight::Real, upperbound::Real; steps = 200) = FuzzyNumber(interval(CoreLeft, CoreRight), interval(lowerbound, upperbound), steps = steps)
 FuzzyNumber(lowerbound::Real, Core::Interval{<:Real}, upperbound::Real; steps = 200) = FuzzyNumber(Core, interval(lowerbound, upperbound), steps = steps)
 
-function FuzzyNumber(Membership::Array{Interval{T},1}) where T <: Real
+function FuzzyNumber(Membership::Vector{Interval{T}}) where T <: Real
 
     # if !isnested(Membership); throw(ArgumentError("Invalid Membership function, intervals must be nested from Range (Membership[1]) to Core (Membership[end])")); end
     Core = Membership[end]; Range = Membership[1];
@@ -69,11 +69,10 @@ function isnested( a :: Array{Interval{T}, 1}) where T <: Real
     return leftSorted & rightSorted
 end =#
 
-# isnested(a :: Array{Interval{T}, 1}) where T <: Real = issorted(a, lt=⊂, rev=true)
+# isnested(a :: Vector{Interval{T}}) where T <: Real = issorted(a, lt=⊂, rev=true)
 
-isnested(a::Array{Interval{T},1}) where T <: Real = all(a[2:end] .⊆ a[1:end - 1])
-# isnested(a :: Array{Interval{T}, 1}) where T <: Real = true
-iscons( a::Array{Interval{T},1}) where T <: Real = isnested(a)
+isnested(a::Vector{Interval{T}}) where T <: Real = all(a[2:end] .⊆ a[1:end - 1])
+iscons( a::Vector{Interval{T}}) where T <: Real = isnested(a)
 
 
 function mass(x::FuzzyNumber, y::Interval{T}) where T <: Real
@@ -139,23 +138,6 @@ function descritize(x::FuzzyNumber, steps = 200)
 
 end
 
-
-function makeConsOld(x::Array{Interval{T},1}) where T <: Real
-
-    x = sort(x, lt = ⊂); x = reverse(x)
-    z = Interval{Float64}[]
-    for i = 1:length(x) - 1
-        lo = x[i + 1].lo; hi = x[i + 1].hi;
-        if x[i].lo < lo; lo = x[i].lo;end
-        if x[i].hi > hi; hi = x[i].hi;end
-        push!(z, interval(lo, hi))
-    end
-    push!(z, x[end])
-    if !isnested(z) z = makeCons(z);end
-    return z
-end
-
-
 function isThisEmpty(x :: Interval)
     if x == ∅ return true; end
     return false
@@ -166,7 +148,7 @@ end
 #   Imprecise probability to possibility transform. Converts a general random set to a fuzzy number.
 ##
 
-function DSS2Fuzzy(FE::Array{Interval{T},1}, masses::Array{Float64,1} = ones(Integer(length(FE))) ./ length(FE); steps = length(FE)) where T <: Real
+function DSS2Fuzzy(FE::Vector{Interval{T}}, masses::Vector{Float64} = ones(Integer(length(FE))) ./ length(FE); steps = length(FE)) where T <: Real
 
     if length(FE) < steps; steps = length(FE); end
 
@@ -206,7 +188,7 @@ function DSS2Fuzzy(FE::Array{Interval{T},1}, masses::Array{Float64,1} = ones(Int
     return Fuzzy(zMems)
 end
 
-function DSS2FuzzySlow(FE::Array{Interval{T},1}, masses::Array{Float64,1} = ones(Integer(length(FE))) ./ length(FE); steps = length(FE)) where T <: Real
+function DSS2FuzzySlow(FE::Vector{Interval{T}}, masses::Vector{Float64} = ones(Integer(length(FE))) ./ length(FE); steps = length(FE)) where T <: Real
 
     if length(FE) < steps; steps = length(FE); end
 
@@ -243,7 +225,7 @@ function DSS2FuzzySlow(FE::Array{Interval{T},1}, masses::Array{Float64,1} = ones
 end
 
 
-function DSS2Fuzzy2(FE::Array{Interval{T},1}, masses::Array{Float64,1} = ones(Integer(length(FE))) ./ length(FE); steps = length(FE)) where T <: Real
+function DSS2Fuzzy2(FE::Vector{Interval{T}}, masses::Vector{Float64} = ones(Integer(length(FE))) ./ length(FE); steps = length(FE)) where T <: Real
 
     if length(FE) < steps; steps = length(FE); end
 
@@ -278,7 +260,7 @@ end
 
 
 
-function DSS2FuzzyDom(FE::Array{Interval{T},1}, masses::Array{Float64,1} = ones(Integer(length(FE))) ./ length(FE); steps = length(FE)) where T <: Real
+function DSS2FuzzyDom(FE::Vector{Interval{T}}, masses::Vector{Float64} = ones(Integer(length(FE))) ./ length(FE); steps = length(FE)) where T <: Real
 
     if length(FE) < steps; steps = length(FE); end
 
@@ -422,7 +404,7 @@ function DSS2Fuzzy(FE::Array{Interval{T},1}, masses::Array{Float64,1} = ones(Int
     return Fuzzy(zMems)
 end
 =#
-function makeCons1(x::Array{Interval{T},1}) where T <: Real
+function makeCons1(x::Vector{Interval{T}}) where T <: Real
 
     x = sort(x, lt = ⊂); # x = reverse(x)
     z = Interval{Float64}[]
@@ -437,7 +419,7 @@ end
 
 dia(x, y) = diam(x) < diam(y)
 
-function makeCons2(x::Array{Interval{T},1}) where T <: Real
+function makeCons2(x::Vector{Interval{T}}) where T <: Real
 
     x = sort(x, rev = true);
     z = Interval{Float64}[]

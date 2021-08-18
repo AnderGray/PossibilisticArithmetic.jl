@@ -66,7 +66,7 @@ for op in (:-, :sin, :cos, :tan, :exp, :log)
     @eval ($op)(x::AbstractPoss) = FuzzyNumber(broadcast($op, x.Membership))
 end
 
-#= 
+#=
 +( x :: FuzzyNumber, y :: FuzzyNumber)  = levelwise(x, y, op = +)
 -( x :: FuzzyNumber, y :: FuzzyNumber)  = levelwise(x, y, op = -)
 *( x :: FuzzyNumber, y :: FuzzyNumber)  = levelwise(x, y, op = *)
@@ -75,14 +75,14 @@ end
 function mobiusTransform2D(x::Fuzzy, y::Fuzzy, C)
 
     xMems = x.Membership; yMems = y.Membership;
-    xBel  = range(1, 0, length = length(xMems))
-    yBel  = range(1, 0, length = length(yMems))
+    xBel  = range(1, 0, length = length(xMems)+1)
+    yBel  = range(1, 0, length = length(yMems)+1)
 
     cartProd = Array{Interval{Float64},1}[]
     masses = Float64[]
 
-    for i = 1:length(xMems) - 1
-        for j = 1:length(yMems) - 1
+    for i = 1:length(xMems)
+        for j = 1:length(yMems)
             thisMass = C(xBel[i], yBel[j]) - C(xBel[i + 1], yBel[j]) - C(xBel[i], yBel[j + 1]) + C(xBel[i + 1], yBel[j + 1])
             push!(masses, thisMass[1])
             push!(cartProd, [xMems[i], yMems[j]])
@@ -93,6 +93,14 @@ end
 
 function sigmaFuzzy(x::Fuzzy, y::Fuzzy; op = +, C = Pi())
 
+    #=
+    if op == -;
+        return sigmaFuzzy(x, -y, op=+, C = rotate(C));
+    end
+    if op == /;
+        return sigmaFuzzy(x, 1/y, op=/, C = rotate(C));
+    end
+    =#
     if C == W; return levelwiseOpp(x, y, op = op);end
     if C == M; return levelwise(x, y, op = op);end
 
@@ -107,9 +115,167 @@ end
 sigmaFuzzy(x::FuzzyNumber, y::Real; op = +, C = π()) = sigmaFuzzy(x, makefuzzy(y); op = op, C = C)
 sigmaFuzzy(x::Real, y::FuzzyNumber; op = +, C = π()) = sigmaFuzzy(makefuzzy(x), y; op = op, C = C)
 
+function sigmaFuzzySampling(x::Fuzzy, y::Fuzzy; op = +, C = Pi(), Nsamps =10^3)
 
+
+    masses, cartProd = mobiusTransform2D(x, y, C)       # Get carteesian prod and masses from Möbius
+
+    x1 = x.Membership[1]; y1 = y.Membership[1];
+
+    xSamps = rand(Nsamps) .* diam(x1) .+ x1.lo
+    ySamps = rand(Nsamps) .* diam(y1) .+ y1.lo
+
+    #XYsamps = hcat(xSamps, ySamps);
+    XYsamps = IntervalBox.(xSamps, ySamps);
+    boxes = IntervalBox.(cartProd);
+
+    outSamps = op(xSamps, ySamps);
+
+    outInts = interval.(zeros(length(masses)));
+    these = [samp ⊆  b for b in boxes, samp in XYsamps];
+
+    those = []
+
+    for i =1:length(masses)
+        if !any(these[i,:])
+            push!(those, i)
+        else
+            outInts[i] = hull(interval.(outSamps[these[i,:]]))
+        end
+    end
+
+    those = sort!(those, rev= true)
+
+    [popat!(masses, t) for t in those]
+    [popat!(outInts, t) for t in those]
+
+    return DSS2Fuzzy(outInts, masses, steps = max(length(x.Membership), length(y.Membership)))
+end
+
+function sigmaFuzzySampling2(x::Fuzzy, y::Fuzzy; op = +, C = Pi(), Nsamps =10^3)
+
+
+    masses, cartProd = mobiusTransform2D(x, y, C)       # Get carteesian prod and masses from Möbius
+
+    x1 = x.Membership[1]; y1 = y.Membership[1];
+
+    xSamps = rand(Nsamps) .* diam(x1) .+ x1.lo
+    ySamps = rand(Nsamps) .* diam(y1) .+ y1.lo
+
+    #XYsamps = hcat(xSamps, ySamps);
+    XYsamps = IntervalBox.(xSamps, ySamps);
+    boxes = IntervalBox.(cartProd);
+
+    outSamps = op(xSamps, ySamps);
+
+    poss = zeros(Nsamps)
+
+    for i = 1:Nsamps
+        these = XYsamps[i,:] .⊆ boxes
+        poss[i] = sum(masses[these])
+    end
+
+    #poss = 1 .- poss
+    return outSamps, poss
+end
+
+
+function sigmaFuzzySampling3(x::Fuzzy, y::Fuzzy; op = +, C = Pi(), Nsamps =10^3)
+
+
+    masses, cartProd = mobiusTransform2D(x, y, C)       # Get carteesian prod and masses from Möbius
+
+    x1 = x.Membership[1]; y1 = y.Membership[1];
+
+    xSamps = rand(Nsamps) .* diam(x1) .+ x1.lo
+    ySamps = rand(Nsamps) .* diam(y1) .+ y1.lo
+
+    XYsamps = hcat(xSamps, ySamps);
+    #XYsamps = IntervalBox.(xSamps, ySamps);
+    boxes = IntervalBox.(cartProd);
+
+    outSamps = op(xSamps, ySamps);
+
+    poss = zeros(Nsamps)
+
+    for i = 1:Nsamps
+        these = [XYsamps[i,:] ∈ b for b in boxes]
+        poss[i] = sum(masses[these])
+    end
+
+    #poss = 1 .- poss
+    return outSamps, poss
+end
+
+function sigmaFuzzySampling4(x::Fuzzy, y::Fuzzy; op = +, C = Pi(), Nsamps =10^3)
+
+
+    masses, cartProd = mobiusTransform2D(x, y, C)       # Get carteesian prod and masses from Möbius
+
+    x1 = x.Membership[1]; y1 = y.Membership[1];
+
+    xSamps = rand(Nsamps) .* diam(x1) .+ x1.lo
+    ySamps = rand(Nsamps) .* diam(y1) .+ y1.lo
+
+    #XYsamps = hcat(xSamps, ySamps);
+    XYsamps = IntervalBox.(xSamps, ySamps);
+    boxes = IntervalBox.(cartProd);
+
+    subposs = x.Membership .× y.Membership
+
+    #=
+    verts = vertices.(boxes)
+    ver = verts[1]
+    for i = 2:length(boxes)-1
+        ver = vcat(ver, verts[i])
+    end
+    =#
+
+    plaus = zeros(length(subposs))
+    for i = 1:length(subposs)
+        these = [subposs[i] ⊆ b for b in boxes]
+        plaus[i] = sum(masses[these])
+    end
+
+    outSamps = op(xSamps, ySamps);
+
+    poss = zeros(Nsamps)
+
+    for i = 1:Nsamps
+        these = XYsamps[i,:] .⊆ subposs
+        poss[i] = maximum(plaus[these])
+    end
+
+
+    return outSamps, poss
+end
+
+function vertices(box :: IntervalBox)
+
+    Ndims = length(box);
+    Nverts = 2^Ndims;
+
+    verts = zeros(Nverts, Ndims);
+
+    for i =1:Ndims
+
+        A = [box[i].lo box[i].hi]
+        j1 = 2^(i-1); j2 = 2^(Ndims - i);
+
+        As = repeat(A , outer = (j1, j2));
+
+        verts[:,i] = As[:]
+
+    end
+
+    return verts
+
+end
 
 function tauFuzzy(x::FuzzyNumber, y::FuzzyNumber; op = +, C = Pi())
+
+    #if op = -; return tauFuzzy(x, -y, op=+, C = rotate(C)); end
+    #if op = /; return tauFuzzy(x, 1/y, op=/, C = rotate(C)); end
 
     numX = length(x.Membership); numY = length(y.Membership);
 
@@ -205,7 +371,7 @@ supGen(x::FuzzyNumber, y::FuzzyNumber;op = +) = supT(x, y, op = op, T = Tgen)
 supInd(x::FuzzyNumber, y::FuzzyNumber;op = +) = supT(x, y, op = op, T = Tind)
 
 
-#=  Old codes
+
 
 function sigmaFuzzyOld(x :: Fuzzy, y::Fuzzy; op = +, C = Pi())
 
@@ -246,7 +412,7 @@ function sigmaFuzzyOld(x :: Fuzzy, y::Fuzzy; op = +, C = Pi())
     if !isnested(zMems); zMems= makeCons(zMems);end
     return Fuzzy(zMems)
 end
-
+#=  Old codess
 
 function sigmaFuzzy1(x :: Fuzzy, y::Fuzzy; op = +, C = Pi())
 

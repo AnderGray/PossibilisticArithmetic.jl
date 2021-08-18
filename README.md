@@ -1,7 +1,19 @@
 # FuzzyArithmetic.jl
 ![Build Status](https://github.com/Institute-for-Risk-and-Uncertainty/FuzzyArithmetic.jl/workflows/CI/badge.svg)
 
-A julia package for performing fuzzy arithmetic.
+[Possibility Theory](https://en.wikipedia.org/wiki/Possibility_theory): Fuzzy set theory applied to bounding sets of probability measures. 
+
+Julia package for performing rigorous arithmetic of Imprecise Probabilities with fuzzy numbers.
+
+Installation
+---
+
+`PossibilisticArithmtic.jl` is a not yet a registered Julia package, and so the latest release can be installed using the Julia package manager:
+
+```julia
+julia> ]
+(v1.0) pkg> add https://github.com/AnderGray/FuzzyArithmetic.jl
+```
 
 ### In development. Package can currently:
 

@@ -35,7 +35,8 @@ Installation
 
 ```julia
 julia> ]
-(v1.0) pkg> add https://github.com/AnderGray/FuzzyArithmetic.jl
+(v1.0) pkg> add https://github.com/AnderGray/PossibilisticArithmetic.jl
+julia> using PossibilisticArithmetic
 ```
 
 Use
@@ -43,6 +44,9 @@ Use
 
 ```julia
 julia> a = FuzzyNumber(0, 1, 2)
+Fuzzy: 	 ~ ( Range=[0, 2], Core=1.0 )
+
+julia> a = FuzzyNumber(0, 1, 2, steps = 200) # Give number of steps, default = 200
 Fuzzy: 	 ~ ( Range=[0, 2], Core=1.0 )
 
 julia> cut(a,0.2)
@@ -54,7 +58,10 @@ Fuzzy: 	 ~ ( Range=[0, 2], Core=[1, 1.5] )
 julia> c = a * b
 Fuzzy: 	 ~ ( Range=[0, 4], Core=[1, 1.5] )
 
-julia> mass(c, 3, 4)   # Get probability mass between two values
+julia> mass(c, interval(3, 4) )   # Bound probability measure in some set
+[0, 0.351759]
+
+julia> mass(c, 3, 4)   # Same as above
 [0, 0.351759]
 
 julia> c(3, 4)         # Can also query object directly

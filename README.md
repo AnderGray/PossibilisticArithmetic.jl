@@ -3,9 +3,7 @@
 
 [Possibility Theory](https://en.wikipedia.org/wiki/Possibility_theory): fuzzy set theory applied to bounding sets of probability measures ([Imprecise Probabilities](https://en.wikipedia.org/wiki/Imprecise_probability)). This package gives a rigorous arithetic between possibility distributions.
 
-### In development. All contributions welcome
-
-### Package can currently:
+### In development. Package can currently:
 
 * Construct fuzzy numbers with a real or interval core
 * Robust outer approximations of the membership functions with different step sizes

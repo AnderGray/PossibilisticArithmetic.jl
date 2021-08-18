@@ -1,9 +1,18 @@
 # FuzzyArithmetic.jl
 ![Build Status](https://github.com/Institute-for-Risk-and-Uncertainty/FuzzyArithmetic.jl/workflows/CI/badge.svg)
 
-[Possibility Theory](https://en.wikipedia.org/wiki/Possibility_theory): Fuzzy set theory applied to bounding sets of probability measures. 
+[Possibility Theory](https://en.wikipedia.org/wiki/Possibility_theory): fuzzy set theory applied to bounding sets of probability measures ([Imprecise Probabilities](https://en.wikipedia.org/wiki/Imprecise_probability)). This package gives a rigorous arithetic between possibility distributions.
 
-Julia package for performing rigorous arithmetic of Imprecise Probabilities with fuzzy numbers.
+### In development. Package can currently:
+
+* Construct fuzzy numbers with a real or interval core
+* Have different discretization of the membership function
+* Get interval bounds on probabilities
+* Perform dependent arithmeric (using [copulas](https://github.com/AnderGray/BivariateCopulas.jl)) between fuzzy numbers, intervals and scalars
+* Unary operators: `-, sin, cos, tan, exp, log`
+* Interacts with [ProbabilityBoundsAnalysis.jl](https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl)
+* Plot fuzzy numbers
+
 
 Installation
 ---
@@ -15,33 +24,8 @@ julia> ]
 (v1.0) pkg> add https://github.com/AnderGray/FuzzyArithmetic.jl
 ```
 
-### In development. Package can currently:
-
-* Construct fuzzy numbers with a real or interval core
-* Have different discretization of the membership function
-* Perform alpha cuts
-* Perform levelwise arithmeric between fuzzy numbers, intervals and scalars
-* Unary operators: `-, sin, cos, tan, exp, log`
-* Get bounds on probability mass in an interval
-* Plot fuzzy numbers
-
-## Install:
-
-```BASH
-# Download from git
-git clone https://github.com/Institute-for-Risk-and-Uncertainty/FuzzyArithmetic.jl.git  
-
-# Enter package
-cd FuzzyArithmetic.jl       
-
-# Begin julia
-julia                       
-```
-```julia
-julia> include("src/FuzzyNumbers.jl")
-```
-
-## Use:
+Use
+---
 
 ```julia
 julia> a = FuzzyNumber(0, 1, 2)

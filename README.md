@@ -18,6 +18,15 @@
 ### Soon:
 * Multimodal Possibility Distributions (non-convext fuzzy sets) using [IntervalUnionArithmetic.jl](https://github.com/AnderGray/IntervalUnionArithmetic.jl)
 
+Resources
+---
+
+* Fuzzy & Possibility Interest Group (FnPIG) [google site](https://sites.google.com/site/fuzzypossrisk/)
+* Society for Imprecise Probabilities: Theories and Applications [website](https://www.sipta.org)
+* [ISIPTA21 paper](https://leo.ugr.es/isipta21/pmlr/gray21.pdf)
+* [ISIPTA21 poster](https://www.researchgate.net/publication/353220811_Poster_Dependent_Possibilistic_Arithmetic_using_Copulas)
+
+
 Installation
 ---
 
@@ -27,14 +36,6 @@ Installation
 julia> ]
 (v1.0) pkg> add https://github.com/AnderGray/FuzzyArithmetic.jl
 ```
-
-Resources
----
-
-* Fuzzy & Possibility Interest Group (FnPIG) [google site](https://sites.google.com/site/fuzzypossrisk/)
-* Society for Imprecise Probabilities: Theories and Applications [website](https://www.sipta.org)
-* [ISIPTA21 paper](https://leo.ugr.es/isipta21/pmlr/gray21.pdf)
-* [ISIPTA21 poster](https://www.researchgate.net/publication/353220811_Poster_Dependent_Possibilistic_Arithmetic_using_Copulas)
 
 Use
 ---

@@ -1,7 +1,7 @@
 # PossibilisticArithmetic.jl
 ![Build Status](https://github.com/Institute-for-Risk-and-Uncertainty/FuzzyArithmetic.jl/workflows/CI/badge.svg)
 
-[Possibility Theory](https://en.wikipedia.org/wiki/Possibility_theory): fuzzy set theory applied to bounding sets of probability measures ([Imprecise Probabilities](https://en.wikipedia.org/wiki/Imprecise_probability)). This package gives a rigorous arithetic between fuzzy numbers. Outer approximations and arithmetic between fuzzy sets are based on [IntervalArithmetic.jl](https://github.com/JuliaIntervals/IntervalArithmetic.jl).
+[Possibility Theory](https://en.wikipedia.org/wiki/Possibility_theory): fuzzy set theory applied to bounding sets of probability measures ([Imprecise Probabilities](https://en.wikipedia.org/wiki/Imprecise_probability)). This package gives a rigorous arithmetic between fuzzy numbers. Outer approximations and arithmetic between fuzzy sets are based on [IntervalArithmetic.jl](https://github.com/JuliaIntervals/IntervalArithmetic.jl).
 
 ### In development. Package can currently:
 

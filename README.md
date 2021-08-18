@@ -8,9 +8,9 @@
 ### Package can currently:
 
 * Construct fuzzy numbers with a real or interval core
-* Have different discretization of the membership function
+* Robust outer approximations of the membership functions with different step sizes
 * Get interval bounds on probabilities
-* Perform dependent arithmeric (using [copulas](https://github.com/AnderGray/BivariateCopulas.jl)) between fuzzy numbers, intervals and scalars
+* Perform dependent arithmeric (using [copulas](https://github.com/AnderGray/BivariateCopulas.jl)) between fuzzy numbers
 * Unary operators: `-, sin, cos, tan, exp, log`
 * Interacts with [ProbabilityBoundsAnalysis.jl](https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl) and [IntervalArithmetic.jl](https://github.com/JuliaIntervals/IntervalArithmetic.jl)
 * Conversions between fuzzy numbers, [p-boxes](https://en.wikipedia.org/wiki/Probability_box), and more general [random sets](https://en.wikipedia.org/wiki/Dempster–Shafer_theory)

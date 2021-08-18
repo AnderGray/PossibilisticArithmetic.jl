@@ -19,6 +19,7 @@
 
 ### Soon:
 * Multimodal possibility distributions (non-convext fuzzy sets) using [IntervalUnionArithmetic.jl](https://github.com/AnderGray/IntervalUnionArithmetic.jl)
+* Distribution parameteric constructors
 * Documentation and testing
 
 Resources

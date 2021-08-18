@@ -25,7 +25,7 @@
 Resources
 ---
 
-* Fuzzy & Possibility Interest Group (FnPIG) [google site](https://sites.google.com/site/fuzzypossrisk/)
+* Fuzzy & Possibility Interest Group (FnPIG) [google site](https://sites.google.com/site/fuzzypossrisk/) (access granted on request)
 * Society for Imprecise Probabilities: Theories and Applications [website](https://www.sipta.org)
 * [ISIPTA21 paper](https://leo.ugr.es/isipta21/pmlr/gray21.pdf)
 * [ISIPTA21 poster](https://www.researchgate.net/publication/353220811_Poster_Dependent_Possibilistic_Arithmetic_using_Copulas)

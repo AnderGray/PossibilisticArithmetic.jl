@@ -1,5 +1,5 @@
 ###
-#   This file is a part of FuzzyArithmetic.jl package
+#   This file is a part of PossibilisticArithmetic.jl package
 #
 #   Defines plotting functions
 #
@@ -70,7 +70,7 @@ function plotOld(x::FuzzyNumber, fill = true; name = missing, col = missing, alp
     xlabel("Range", fontsize = fontsize); ylabel("α", fontsize = fontsize);
 
 end
-#= 
+#=
 
 function plot(x :: PossNumber, fill = true; name = missing, col = missing, alpha = 0.2, fontsize = 18)
 
@@ -161,7 +161,7 @@ function plot(x :: PossNumber, fill = true; name = missing, col = missing, alpha
 
 end =#
 
-#= 
+#=
 function plot(x :: tnorm; name =missing, pn = 50, fontsize=18, alpha = 0.8, title = missing)
     A = x.T
     if !ismissing(x.func)

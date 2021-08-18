@@ -1,5 +1,5 @@
 ###
-#   This file is a part of FuzzyArithmetic.jl package
+#   This file is a part of PossibilisticArithmetic.jl package
 #
 #   Defines fuzzy arithemtic functions
 #

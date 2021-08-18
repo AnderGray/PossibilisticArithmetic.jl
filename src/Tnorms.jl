@@ -1,7 +1,8 @@
 ###
-#   This file is a part of FuzzyArithmetic.jl package
+#   This file is a part of PossibilisticArithmetic.jl package
 #
-#   This file defines a FuzzyNumber type, and various supporting functions
+#   Deffinition of t-norms. Note, t-norms have been replaced with copulas:
+#               https://github.com/AnderGray/BivariateCopulas.jl
 #
 #           University of Liverpool, Institute for Risk and Uncertainty
 #

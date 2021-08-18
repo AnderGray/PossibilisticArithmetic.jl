@@ -1,3 +1,14 @@
+###
+#   This file is a part of PossibilisticArithmetic.jl package for performing
+#   rigorous operations with possibility distributions/ fuzzy numbers
+#
+#           University of Liverpool, Institute for Risk and Uncertainty
+#
+#                                           Author: Ander Gray
+#                                           Email:  ander.gray@liverpool.ac.uk
+###
+
+
 module PossibilisticArithmetic
 
 using ProbabilityBoundsAnalysis, IntervalArithmetic, PyPlot

@@ -1,5 +1,5 @@
 ###
-#   This file is a part of FuzzyArithmetic.jl package
+#   This file is a part of PossibilisticArithmetic.jl package
 #
 #   This file defines a FuzzyNumber type, and various supporting functions
 #
@@ -12,7 +12,7 @@
 """
     struct FuzzyNumber <: AbstractPoss
 
-Basic type in FuzzyArithmetic. Defines a set of nested intervals (Membership), starting from Range (Membership[1]) to the core (Membership[end])
+Basic type in PossibilisticArithmetic. Defines a set of nested intervals (Membership), starting from Range (Membership[1]) to the core (Membership[end])
 
 Used to bound a set of probability distribution functions in the Imprecise Probability sense
 

@@ -9,6 +9,9 @@
 * Robust outer approximations of the membership functions with different step sizes
 * Get interval bounds on probabilities
 * Perform dependent arithmeric (using [copulas](https://github.com/AnderGray/BivariateCopulas.jl)) between fuzzy numbers
+    * Levelwise arithmetic (standard fuzzy arithmetic)
+    * Arithmetic with a precise copula defined (sigma convolutions)
+    * Arithmetic with a copula's bound defined (tau convolutions)
 * Unary operators: `-, sin, cos, tan, exp, log`
 * Interacts with [ProbabilityBoundsAnalysis.jl](https://github.com/AnderGray/ProbabilityBoundsAnalysis.jl) and [IntervalArithmetic.jl](https://github.com/JuliaIntervals/IntervalArithmetic.jl)
 * Conversions between fuzzy numbers, [p-boxes](https://en.wikipedia.org/wiki/Probability_box), and more general [random sets](https://en.wikipedia.org/wiki/Dempster–Shafer_theory)

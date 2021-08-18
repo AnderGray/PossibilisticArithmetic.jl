@@ -1,8 +1,12 @@
 module FuzzyArithmetic
 
+using Base: subtract_singletontype
+using Core: Matrix
 using ProbabilityBoundsAnalysis, IntervalArithmetic, PyPlot
 
 using BivariateCopulas: M, W, Pi, Gaussian
+
+using IntervalUnionArithmetic
 
 import Base: -, +, *, /, //, <, >, ⊆, ^, intersect, issubset, rand, min, max, log, exp, sin, cos, tan, isequal, ∪, ∩
 import ProbabilityBoundsAnalysis: pbox, plot, left, right, mean, var, env, makepbox
@@ -19,13 +23,16 @@ export FuzzyNumber, Fuzzy, mass, membership, isnested, iscons, mean, cut, descri
     # plots
     plot
 
+    # Copulas
+    M, W, Pi, Gaussian
+
 include("FuzzyNumber.jl")
 include("arithmetic.jl")
 # include("Tnorms.jl")
 # include("PossibilityNumbers.jl")
 # include("PossArithmetic.jl")
 include("plots.jl")
-include("inference.jl")
+#include("inference.jl")
 
 
 

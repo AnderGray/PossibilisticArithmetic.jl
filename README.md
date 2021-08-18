@@ -15,7 +15,8 @@
 * Plot fuzzy numbers
 
 ### Soon:
-* Multimodal Possibility Distributions (non-convext fuzzy sets) using [IntervalUnionArithmetic.jl](https://github.com/AnderGray/IntervalUnionArithmetic.jl)
+* Multimodal possibility distributions (non-convext fuzzy sets) using [IntervalUnionArithmetic.jl](https://github.com/AnderGray/IntervalUnionArithmetic.jl)
+* Documentation and testing
 
 Resources
 ---

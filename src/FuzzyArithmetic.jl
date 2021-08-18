@@ -4,7 +4,7 @@ using ProbabilityBoundsAnalysis, IntervalArithmetic, PyPlot
 
 using BivariateCopulas: M, W, Pi, Gaussian
 
-using IntervalUnionArithmetic
+#using IntervalUnionArithmetic
 
 import Base: -, +, *, /, //, <, >, ⊆, ^, intersect, issubset, rand, min, max, log, exp, sin, cos, tan, isequal, ∪, ∩
 import ProbabilityBoundsAnalysis: pbox, plot, left, right, mean, var, env, makepbox

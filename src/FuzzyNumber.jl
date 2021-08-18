@@ -188,11 +188,6 @@ function DSS2Fuzzy(FE::Array{Interval{T},1}, masses::Array{Float64,1} = ones(Int
 end
 =#
 
-function isThisEmpty(x :: IntervalU)
-    if all(x.v .== ∅) return true; end
-    return false
-end
-
 function isThisEmpty(x :: Interval)
     if x == ∅ return true; end
     return false

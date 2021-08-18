@@ -1,13 +1,15 @@
 
 
-left(x::IntervalU) = left.(x.v)
-right(x::IntervalU) = right.(x.v)
+#using IntervalUnionArithmetic
+
+left(x::IntervalUnion) = left.(x.v)
+right(x::IntervalUnion) = right.(x.v)
 
 struct PossNumber <: AbstractPoss
 
-    Core::IntervalU{T} where T <: Real
-    Range::IntervalU{T} where T <: Real
-    Membership::Vector{IntervalU{T}} where T <: Real
+    Core::IntervalUnion{T} where T <: Real
+    Range::IntervalUnion{T} where T <: Real
+    Membership::Vector{IntervalUnion{T}} where T <: Real
 
     function PossNumber(Core = intervalU(0.5), Range = intervalU(0, 1), Membership = missing; steps = 200)
 
@@ -28,11 +30,11 @@ end
 
 Possibility = PossNumber
 
-PossNumber(lowerbound::Real, Core::Real, upperbound::Real; steps = 200) = PossNumber(intervalU(Core), intervalU(lowerbound, upperbound), steps = steps)
-PossNumber(lowerbound::Real, CoreLeft::Real, CoreRight::Real, upperbound::Real; steps = 200) = PossNumber(interval(CoreLeft, CoreRight), intervalU(lowerbound, upperbound), steps = steps)
-PossNumber(lowerbound::Real, Core::Interval{<:Real}, upperbound::Real; steps = 200) = PossNumber(Core, intervalU(lowerbound, upperbound), steps = steps)
+PossNumber(lowerbound::Real, Core::Real, upperbound::Real; steps = 200) = PossNumber(intervalUnion(Core), intervalUnion(lowerbound, upperbound), steps = steps)
+PossNumber(lowerbound::Real, CoreLeft::Real, CoreRight::Real, upperbound::Real; steps = 200) = PossNumber(interval(CoreLeft, CoreRight), intervalUnion(lowerbound, upperbound), steps = steps)
+PossNumber(lowerbound::Real, Core::Interval{<:Real}, upperbound::Real; steps = 200) = PossNumber(Core, intervalUnion(lowerbound, upperbound), steps = steps)
 
-function PossNumber(Membership::Vector{IntervalU{T}}) where T <: Real
+function PossNumber(Membership::Vector{IntervalUnion{T}}) where T <: Real
 
     # if !isnested(Membership); throw(ArgumentError("Invalid Membership function, intervals must be nested from Range (Membership[1]) to Core (Membership[end])")); end
     Core = Membership[end]; Range = Membership[1];
@@ -40,6 +42,10 @@ function PossNumber(Membership::Vector{IntervalU{T}}) where T <: Real
 
 end
 
+function isThisEmpty(x :: IntervalUnion)
+    if all(x.v .== ∅) return true; end
+    return false
+end
 
 function ∪(x::Union{PossNumber,FuzzyNumber}, y::Union{PossNumber,FuzzyNumber})
 
@@ -53,7 +59,7 @@ function ∪(x::FuzzyNumber, y::FuzzyNumber)
     return PossNumber(zMems)
 end
 
-FuzzyNumber(Membership::Vector{IntervalU{T}}) where T <: Real = PossNumber(Membership)
+FuzzyNumber(Membership::Vector{IntervalUnion{T}}) where T <: Real = PossNumber(Membership)
 
 function membership(F::PossNumber, x::Union{Float64,Int64})
     mems = F.Membership

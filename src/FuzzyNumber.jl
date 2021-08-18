@@ -156,78 +156,15 @@ function makeConsOld(x::Array{Interval{T},1}) where T <: Real
 end
 
 
-##
-#   Imprecise probability to possibility transform
-##
-#=
-function DSS2Fuzzy(FE::Array{Interval{T},1}, masses::Array{Float64,1} = ones(Integer(length(FE))) ./ length(FE); steps = length(FE)) where T <: Real
-
-    if length(FE) < steps; steps = length(FE); end
-
-    lefts = FuzzyArithmetic.left.(FE);
-    rights = FuzzyArithmetic.right.(FE);
-
-    lefts = sort(lefts); rights = sort(rights)   ## Problem ... Would need to mult by 2. But will be over-conservative.
-
-    bins = [lefts, rights];
-    bins = unique(bins)
-
-    subPos
-
-    subPos = interval.(lefts, rights)
-
-    subPos = unique(subPos)
-
-    NewMembership = [sum(masses[ this .⊆ FE ]) for this in subPos]  # Find beliefs
-
-    memberships = range(0, 1, length = steps + 1)[1:end - 1]
-
-    these = [findall(α .<= NewMembership) for α in memberships]
-
-    return Fuzzy([hull(subPos[this]) for this in these])
-end
-=#
-
 function isThisEmpty(x :: Interval)
     if x == ∅ return true; end
     return false
 end
 
-function DSS2FuzzySlow(FE::Array{Interval{T},1}, masses::Array{Float64,1} = ones(Integer(length(FE))) ./ length(FE); steps = length(FE)) where T <: Real
 
-    if length(FE) < steps; steps = length(FE); end
-
-    lefts = FuzzyArithmetic.left.(FE);
-    rights = FuzzyArithmetic.right.(FE);
-
-    lefts = sort(lefts); rights = sort(rights, rev = true)   ## Problem ... Would need to mult by 2. But will be over-conservative.
-
-    subPos = interval.(lefts, rights)
-
-    subPos = unique(subPos)
-
-    subPosC = IntervalUnionArithmetic.complement.(subPos)
-
-    NewMembership = [sum(masses[ .!isThisEmpty.(this .∩ FE) ]) for this in subPosC]  # Find beliefs
-
-    zPos = range(0,1, length=steps+1)
-
-    zMems = Interval{Float64}[]
-
-    push!(zMems, subPos[1])
-
-    for i = 2:length(zPos)-1                               # Find alpha cuts for return Fuzzy
-        theseOnes =  zPos[i] .<= NewMembership .< zPos[i+1]
-        if !any(theseOnes);
-            thisInt = zMems[end]
-        else
-            thisInt = hull(subPos[theseOnes])
-        end
-        push!(zMems, thisInt);
-    end
-
-    return Fuzzy(zMems)
-end
+##
+#   Imprecise probability to possibility transform. Converts a general random set to a fuzzy number.
+##
 
 function DSS2Fuzzy(FE::Array{Interval{T},1}, masses::Array{Float64,1} = ones(Integer(length(FE))) ./ length(FE); steps = length(FE)) where T <: Real
 
@@ -257,6 +194,42 @@ function DSS2Fuzzy(FE::Array{Interval{T},1}, masses::Array{Float64,1} = ones(Int
     push!(zMems, subPos[1])
 
     for i = 2:length(zPos)-1                                # Find alpha cuts for return Fuzzy
+        theseOnes =  zPos[i] .<= NewMembership .< zPos[i+1]
+        if !any(theseOnes);
+            thisInt = zMems[end]
+        else
+            thisInt = hull(subPos[theseOnes])
+        end
+        push!(zMems, thisInt);
+    end
+
+    return Fuzzy(zMems)
+end
+
+function DSS2FuzzySlow(FE::Array{Interval{T},1}, masses::Array{Float64,1} = ones(Integer(length(FE))) ./ length(FE); steps = length(FE)) where T <: Real
+
+    if length(FE) < steps; steps = length(FE); end
+
+    lefts = FuzzyArithmetic.left.(FE);
+    rights = FuzzyArithmetic.right.(FE);
+
+    lefts = sort(lefts); rights = sort(rights, rev = true)   ## Problem ... Would need to mult by 2. But will be over-conservative.
+
+    subPos = interval.(lefts, rights)
+
+    subPos = unique(subPos)
+
+    subPosC = IntervalUnionArithmetic.complement.(subPos)
+
+    NewMembership = [sum(masses[ .!isThisEmpty.(this .∩ FE) ]) for this in subPosC]  # Find beliefs
+
+    zPos = range(0,1, length=steps+1)
+
+    zMems = Interval{Float64}[]
+
+    push!(zMems, subPos[1])
+
+    for i = 2:length(zPos)-1                               # Find alpha cuts for return Fuzzy
         theseOnes =  zPos[i] .<= NewMembership .< zPos[i+1]
         if !any(theseOnes);
             thisInt = zMems[end]
@@ -316,8 +289,6 @@ function DSS2FuzzyDom(FE::Array{Interval{T},1}, masses::Array{Float64,1} = ones(
 
     #core = FE[idns[1]]
 
-
-
     lefts = FuzzyArithmetic.left.(FE);
     rights = FuzzyArithmetic.right.(FE);
 
@@ -366,6 +337,35 @@ end
 
 
 #=
+
+function DSS2Fuzzy(FE::Array{Interval{T},1}, masses::Array{Float64,1} = ones(Integer(length(FE))) ./ length(FE); steps = length(FE)) where T <: Real
+
+    if length(FE) < steps; steps = length(FE); end
+
+    lefts = FuzzyArithmetic.left.(FE);
+    rights = FuzzyArithmetic.right.(FE);
+
+    lefts = sort(lefts); rights = sort(rights)   ## Problem ... Would need to mult by 2. But will be over-conservative.
+
+    bins = [lefts, rights];
+    bins = unique(bins)
+
+    subPos
+
+    subPos = interval.(lefts, rights)
+
+    subPos = unique(subPos)
+
+    NewMembership = [sum(masses[ this .⊆ FE ]) for this in subPos]  # Find beliefs
+
+    memberships = range(0, 1, length = steps + 1)[1:end - 1]
+
+    these = [findall(α .<= NewMembership) for α in memberships]
+
+    return Fuzzy([hull(subPos[this]) for this in these])
+end
+
+
 function DSS2Fuzzy(FE::Array{Interval{T},1}, masses::Array{Float64,1} = ones(Integer(length(FE))) ./ length(FE); steps = length(FE)) where T <: Real
 
     if length(FE) < steps; steps = length(FE); end

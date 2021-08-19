@@ -18,7 +18,7 @@
 * Plot fuzzy numbers (requires PyPlot)
 
 ### Soon:
-* Multimodal possibility distributions (non-convext fuzzy sets) using [IntervalUnionArithmetic.jl](https://github.com/AnderGray/IntervalUnionArithmetic.jl)
+* Multimodal possibility distributions (non-convex fuzzy sets) using [IntervalUnionArithmetic.jl](https://github.com/AnderGray/IntervalUnionArithmetic.jl)
 * Parameteric distribution constructors
 * Documentation and testing
 

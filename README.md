@@ -34,11 +34,18 @@ Resources
 Installation
 ---
 
-`PossibilisticArithmtic.jl` is a not yet a registered Julia package, and but the latest version can be installed using the Julia package manager:
+`PossibilisticArithmtic.jl` is a registered Julia package, and can be installed using the Julia package manager:
+```julia
+julia> ]
+(v1.0) pkg> add PossibilisticArithmetic
+julia> using PossibilisticArithmetic
+```
+
+or for the latest version:
 
 ```julia
 julia> ]
-(v1.0) pkg> add https://github.com/AnderGray/PossibilisticArithmetic.jl
+(v1.0) pkg> add https://github.com/AnderGray/PossibilisticArithmetic.jl#master
 julia> using PossibilisticArithmetic
 ```
 

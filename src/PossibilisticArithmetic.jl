@@ -20,7 +20,6 @@ import ProbabilityBoundsAnalysis: pbox, plot, left, right, mean, var, env, makep
 
 abstract type AbstractPoss <: Real end
 
-
 export FuzzyNumber, Fuzzy, mass, membership, isnested, iscons, mean, cut, descritize, makeCons, env,
     makepbox, makefuzzy, ecdf2fuzzy, isfuzzy, DSS2Fuzzy,
 
@@ -28,7 +27,9 @@ export FuzzyNumber, Fuzzy, mass, membership, isnested, iscons, mean, cut, descri
     levelwise, levelwiseOpp, supT, mobiusTransform2D, sigmaFuzzy, tauFuzzy,
 
     # plots
-    plot
+    plot,
+
+    left, right
 
     # Copulas
     M, W, Pi, Gaussian
@@ -41,7 +42,8 @@ include("arithmetic.jl")
 include("plots.jl")
 #include("inference.jl")
 
-
+left(x :: Fuzzy) = left.(x.Membership)
+right(x :: Fuzzy) = right.(x.Membership)
 
 function __init__()
     using3D()

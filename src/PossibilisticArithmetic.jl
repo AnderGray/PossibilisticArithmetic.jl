@@ -21,7 +21,7 @@ import ProbabilityBoundsAnalysis: pbox, plot, left, right, mean, var, env, makep
 abstract type AbstractPoss <: Real end
 
 export FuzzyNumber, Fuzzy, mass, membership, isnested, iscons, mean, cut, descritize, makeCons, env,
-    makepbox, makefuzzy, ecdf2fuzzy, isfuzzy, DSS2Fuzzy,
+    makepbox, makefuzzy, ecdf2fuzzy, isfuzzy, DSS2Fuzzy, check_inside,
 
     # arithemtic
     levelwise, levelwiseOpp, supT, mobiusTransform2D, sigmaFuzzy, tauFuzzy,

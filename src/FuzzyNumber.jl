@@ -83,7 +83,7 @@ function mass(x::FuzzyNumber, y::Interval{T}) where T <: Real
     subs = sum(Mems .⊆ y)
     intersects = sum(y .∩ Mems .!= ∅)
 
-    prob = interval(masses * subs, masses * intersects)
+    prob = masses * interval( subs, intersects)
 
     prob = max(prob, 0)
     prob = min(prob, 1)
@@ -492,10 +492,52 @@ function ecdf2fuzzy(x)
     return Fuzzy(Mems)
 end
 
-function linearInterp(Core::Interval, Range::Interval, steps = 200)
-    return interval.(range(Range.lo, Core.lo, length = steps), range(Range.hi, Core.hi, length = steps))
+###
+#   Checks wether a distribution is inside a fuzzy number
+###
+
+function check_inside(F :: Fuzzy, Dist, print = false)
+    F_α = F.Membership      # α-cuts
+    if print; println("i     |     Nec_α    |     m_dist     |     diam(m_dist)"); end
+    for (i, el) in  enumerate(F_α)
+        m_dist = cdf(Dist, el.hi) - cdf(Dist, el.lo)    # mass of Dist in el
+        m_dist = interval(m_dist)
+        Nec_α = mass(F, el, el).lo                # Nec of el
+        if print; println("$i     |     $Nec_α    |     $(m_dist.hi)     |     $(diam(m_dist))" ); end
+        if Nec_α > m_dist.hi
+            return false                                # If nec is higher return false
+        end
+    end
+    return true
 end
 
+###
+#   Linearly interpolates between Range and Core.
+#
+#   Downward rounding for lower bound, upward for upper
+###
+
+function linearInterp(Core::Interval{T}, Range::Interval{T}, steps = 200)  where T <: Real
+
+    lows = setrounding(T, RoundDown) do
+        collect(range(Range.lo, Core.lo, length = steps))
+    end
+
+    highs = setrounding(T, RoundUp) do
+        collect(range(Range.hi, Core.hi, length = steps))
+    end
+
+    return interval.(lows, highs)
+end
+#=
+An alternative to above due to @kolaru
+
+function linearInterp(Core::Interval, Range::Interval, steps = 200)
+    width = Range - Core
+    return reverse([Core + width * k/steps for k in 1:steps])
+end
+
+=#
 
 isfuzzy(x) = typeof(x) <: FuzzyNumber
 

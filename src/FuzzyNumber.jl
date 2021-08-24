@@ -496,14 +496,17 @@ end
 #   Checks wether a distribution is inside a fuzzy number
 ###
 
-function check_inside(F :: Fuzzy, Dist, print = false)
+function check_inside(F :: Fuzzy, Dist; print = false, usemass = false)
     F_α = F.Membership      # α-cuts
-    if print; println("i     |     Nec_α    |     m_dist     |     diam(m_dist)"); end
+    Numel = length(F_α)
+    if print; println("i     |     Nec_α    |     m_dist    "); end
     for (i, el) in  enumerate(F_α)
         m_dist = cdf(Dist, el.hi) - cdf(Dist, el.lo)    # mass of Dist in el
         m_dist = interval(m_dist)
-        Nec_α = mass(F, el, el).lo                # Nec of el
-        if print; println("$i     |     $Nec_α    |     $(m_dist.hi)     |     $(diam(m_dist))" ); end
+        Nec_α = mass(F, el, el).lo                      # Nec of el
+        # Nec_α = (Numel - i + 1)/Numel   <- alternative based on α-cuts
+        Nec_α = usemass ? mass(F, el, el).lo : (Numel - i + 1)/Numel
+        if print; println("$i     |     $Nec_α    |     $(m_dist.hi)     " ); end
         if Nec_α > m_dist.hi
             return false                                # If nec is higher return false
         end

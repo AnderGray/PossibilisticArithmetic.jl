@@ -42,6 +42,10 @@ end
             @test check_inside(A, U3)
             @test check_inside(A, U4)
 
+            @test check_inside(A, U1, usemass = true)
+            @test check_inside(A, U2, usemass = true)
+            @test check_inside(A, U3, usemass = true)
+            @test check_inside(A, U4, usemass = true)
         end
     end
 
@@ -65,6 +69,7 @@ end
 @testset "Floating point error" begin
 
     types = [Float32, Float64, BigFloat]
+
     for i = 1:length(types)-1
         t1 = types[i]
         t2 = types[i+1]
@@ -76,5 +81,4 @@ end
             @test all(B.Membership .⊆ A.Membership)
         end
     end
-
 end

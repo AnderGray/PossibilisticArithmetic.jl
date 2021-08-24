@@ -20,17 +20,30 @@ end
 
 
 @testset "Mass tests" begin
-    A = FuzzyNumber(1, 2, 3);
 
-    @test mass(A, interval(1, 3)).hi == 1
-    @test mass(A, interval(2)) == interval(0,1)
-    @test mass(A, interval(-10, -5)) == interval(0)
+    types = [Float32, Float64, BigFloat]
 
-    A = FuzzyNumber(1, 2, 3, steps = 10);
+    U1 = Uniform(1, 3)
+    U2 = Uniform(1, 2)
+    U3 = Uniform(2, 3)
+    U4 = Uniform(1, 3)
 
-    @test mass(A, interval(1, 3)).hi == 1
-    @test mass(A, interval(2)) == interval(0,1)
-    @test mass(A, interval(-10, -5)).hi == interval(0)
+    for t in types
+
+        for j in [5, 10, 100, 200, 500]
+            A = FuzzyNumber(1, 2, 3, steps = j);
+
+            @test mass(A, interval(1, 3)).hi == 1
+            @test mass(A, interval(2)) == interval(0,1)
+            @test mass(A, interval(-10, -5)) == interval(0)
+
+            @test check_inside(A, U1)
+            @test check_inside(A, U2)
+            @test check_inside(A, U3)
+            @test check_inside(A, U4)
+
+        end
+    end
 
 end
 
@@ -51,12 +64,17 @@ end
 
 @testset "Floating point error" begin
 
-    for i in [5, 10, 100, 200, 500]
+    types = [Float32, Float64, BigFloat]
+    for i = 1:length(types)-1
+        t1 = types[i]
+        t2 = types[i+1]
+        for j in [5, 10, 100, 200, 500]
 
-        A = Fuzzy(1, 2, 3, steps = i)
-        B = Fuzzy(BigFloat(1), BigFloat(2), BigFloat(3), steps = i)
+            A = Fuzzy(t1(1), t1(2), t1(3), steps = j)
+            B = Fuzzy(t2(1), t2(2), t2(3), steps = j)
 
-        @test all(B.Membership .⊆ A.Membership)
+            @test all(B.Membership .⊆ A.Membership)
+        end
     end
 
 end

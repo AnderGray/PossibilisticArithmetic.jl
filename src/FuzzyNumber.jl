@@ -152,8 +152,8 @@ function DSS2Fuzzy(FE::Vector{Interval{T}}, masses::Vector{Float64} = ones(Integ
 
     if length(FE) < steps; steps = length(FE); end
 
-    lefts = FuzzyArithmetic.left.(FE);
-    rights = FuzzyArithmetic.right.(FE);
+    lefts = PossibilisticArithmetic.left.(FE);
+    rights = PossibilisticArithmetic.right.(FE);
 
     lefts = sort(lefts); rights = sort(rights, rev = true)   ## Problem ... Would need to mult by 2. But will be over-conservative.
 
@@ -192,8 +192,8 @@ function DSS2FuzzySlow(FE::Vector{Interval{T}}, masses::Vector{Float64} = ones(I
 
     if length(FE) < steps; steps = length(FE); end
 
-    lefts = FuzzyArithmetic.left.(FE);
-    rights = FuzzyArithmetic.right.(FE);
+    lefts = PossibilisticArithmetic.left.(FE);
+    rights = PossibilisticArithmetic.right.(FE);
 
     lefts = sort(lefts); rights = sort(rights, rev = true)   ## Problem ... Would need to mult by 2. But will be over-conservative.
 
@@ -229,8 +229,8 @@ function DSS2Fuzzy2(FE::Vector{Interval{T}}, masses::Vector{Float64} = ones(Inte
 
     if length(FE) < steps; steps = length(FE); end
 
-    lefts = FuzzyArithmetic.left.(FE);
-    rights = FuzzyArithmetic.right.(FE);
+    lefts = PossibilisticArithmetic.left.(FE);
+    rights = PossibilisticArithmetic.right.(FE);
 
     lefts = sort(lefts); rights = sort(rights, rev = true)   ## Problem ... Would need to mult by 2. But will be over-conservative.
 
@@ -271,8 +271,8 @@ function DSS2FuzzyDom(FE::Vector{Interval{T}}, masses::Vector{Float64} = ones(In
 
     #core = FE[idns[1]]
 
-    lefts = FuzzyArithmetic.left.(FE);
-    rights = FuzzyArithmetic.right.(FE);
+    lefts = PossibilisticArithmetic.left.(FE);
+    rights = PossibilisticArithmetic.right.(FE);
 
     lCon = lefts[idns];
     rCon = rights[idns];
@@ -324,8 +324,8 @@ function DSS2Fuzzy(FE::Array{Interval{T},1}, masses::Array{Float64,1} = ones(Int
 
     if length(FE) < steps; steps = length(FE); end
 
-    lefts = FuzzyArithmetic.left.(FE);
-    rights = FuzzyArithmetic.right.(FE);
+    lefts = PossibilisticArithmetic.left.(FE);
+    rights = PossibilisticArithmetic.right.(FE);
 
     lefts = sort(lefts); rights = sort(rights)   ## Problem ... Would need to mult by 2. But will be over-conservative.
 
@@ -352,8 +352,8 @@ function DSS2Fuzzy(FE::Array{Interval{T},1}, masses::Array{Float64,1} = ones(Int
 
     if length(FE) < steps; steps = length(FE); end
 
-    lefts = FuzzyArithmetic.left.(FE);
-    rights = FuzzyArithmetic.right.(FE);
+    lefts = PossibilisticArithmetic.left.(FE);
+    rights = PossibilisticArithmetic.right.(FE);
 
     lefts = sort(lefts); rights = sort(rights, rev = true)   ## Problem ... Would need to mult by 2. But will be over-conservative.
 
@@ -376,8 +376,8 @@ function DSS2Fuzzy(FE::Array{Interval{T},1}, masses::Array{Float64,1} = ones(Int
 
     if length(FE) < steps; steps = length(FE); end
 
-    lefts = FuzzyArithmetic.left.(FE);
-    rights = FuzzyArithmetic.right.(FE);
+    lefts = PossibilisticArithmetic.left.(FE);
+    rights = PossibilisticArithmetic.right.(FE);
 
     lefts = sort(lefts); rights = sort(rights, rev = true)      ## Problem ... Would need to mult by 2. But will be over-conservative.
 

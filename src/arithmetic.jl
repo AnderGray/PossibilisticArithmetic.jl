@@ -93,16 +93,26 @@ end
 
 function sigmaFuzzy(x::Fuzzy, y::Fuzzy; op = +, C = Pi())
 
-    #=
+
     if op == -;
-        return sigmaFuzzy(x, -y, op=+, C = rotate(C));
+        return sigmaFuzzy(x, -y, op=+, C = rotate270(C));
     end
     if op == /;
-        return sigmaFuzzy(x, 1/y, op=/, C = rotate(C));
+        return sigmaFuzzy(x, 1/y, op=/, C = rotate270(C));
     end
-    =#
-    if C == W; return levelwiseOpp(x, y, op = op);end
-    if C == M; return levelwise(x, y, op = op);end
+
+    if C == M
+        if op == -; return levelwiseOpp(x, -y, op = +); end
+        if op== / ; return levelwiseOpp(x, 1/y, op = +); end
+        return levelwise(x, y, op = op)
+    end
+
+    if C == W
+        if op == -; return levelwise(x, -y, op = +); end
+        if op== / ; return levelwise(x, 1/y, op = +);end
+        return levelwiseOpp(x, y, op = op)
+    end
+
 
     zNum = max(length(x.Membership), length(y.Membership))
     masses, cartProd = mobiusTransform2D(x, y, C)       # Get carteesian prod and masses from Möbius
@@ -115,8 +125,14 @@ end
 sigmaFuzzy(x::FuzzyNumber, y::Real; op = +, C = π()) = sigmaFuzzy(x, makefuzzy(y); op = op, C = C)
 sigmaFuzzy(x::Real, y::FuzzyNumber; op = +, C = π()) = sigmaFuzzy(makefuzzy(x), y; op = op, C = C)
 
-function sigmaFuzzySampling(x::Fuzzy, y::Fuzzy; op = +, C = Pi(), Nsamps =10^3)
+function sigmaFuzzySampling(x::Fuzzy, y::Fuzzy; op = +, C = Pi(), Nsamps = 10^3)
 
+    if op == -;
+        return sigmaFuzzySampling(x, -y, op=+, C = rotate270(C), Nsamps);
+    end
+    if op == /;
+        return sigmaFuzzySampling(x, 1/y, op=/, C = rotate270(C), Nsamps);
+    end
 
     masses, cartProd = mobiusTransform2D(x, y, C)       # Get carteesian prod and masses from Möbius
 
@@ -274,8 +290,8 @@ end
 
 function tauFuzzy(x::FuzzyNumber, y::FuzzyNumber; op = +, C = Pi())
 
-    #if op = -; return tauFuzzy(x, -y, op=+, C = rotate(C)); end
-    #if op = /; return tauFuzzy(x, 1/y, op=/, C = rotate(C)); end
+    if op == -; return tauFuzzy(x, -y, op=+, C = rotate270(C)); end
+    if op == /; return tauFuzzy(x, 1/y, op=/, C = rotate270(C)); end
 
     numX = length(x.Membership); numY = length(y.Membership);
 

@@ -144,6 +144,12 @@ function isThisEmpty(x :: Interval)
 end
 
 
+function isThisEmpty(x :: IntervalUnion)
+    if all(x.v .== ∅) return true; end
+    return false
+end
+
+
 ##
 #   Imprecise probability to possibility transform. Converts a general random set to a fuzzy number.
 ##
@@ -164,12 +170,16 @@ function DSS2Fuzzy(FE::Vector{Interval{T}}, masses::Vector{Float64} = ones(Integ
     rights[needReverse] .= lefts[needReverse]
     lefts[needReverse] .= tmp
 
-    subPos = interval.(lefts, rights)
+    subPos = unique(subPos)
+    #subPosSmaller = interval.(nextfloat.(lefts), prevfloat.(rights))    # Required due to rounding in interval arithemtic
 
     subPos = unique(subPos)
+    #subPosSmaller = unique(subPosSmaller)
 
-    NewMembership = [sum(masses[ this .⊆ FE ]) for this in subPos]  # Find beliefs
-    zPos = range(0,1, length=steps+1)
+    NewMembership = [sum(masses[ .!(FE .⊂ this) ]) for this in subPos]  # Find beliefs
+    #NewMembership = [sum(masses[ isThisEmpty.(this .∩ FE)]) for this in subPos]  # Find beliefs
+    #NewMembership = reverse(NewMembeplotrship)
+    zPos = range(0, 1, length=steps+1)
 
     zMems = Interval{Float64}[]
 
